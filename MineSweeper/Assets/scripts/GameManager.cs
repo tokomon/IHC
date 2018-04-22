@@ -1,8 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using UnityEngine;
+
+
 
 
 public class GameManager : MonoBehaviour
@@ -10,11 +11,11 @@ public class GameManager : MonoBehaviour
     Cell[,] cellMatrix;
     bool ingame;
     const int fijo = 5;
-    int posX =0,posY=0;
-
-   //hacer 3d
+    int posX = 0, posY = 0;
+    List<Mrx> obj;
+    //hacer 3d
     double[,] matrix = new double[fijo, fijo];
-    
+
     public Vector2Int dimension;
     public Cell prefab;
 
@@ -24,69 +25,62 @@ public class GameManager : MonoBehaviour
     public Sprite vanilaSprite;//valor no descubierto
     public Sprite mineSprite;
     public Sprite freeSprite;
-/*
-    dimension.x = 10;
-    dimension.y = 10;
-*/
-  //  vanilaSprite.transform.localScale.x =1;
+    /*
+        dimension.x = 10;
+        dimension.y = 10;
+    */
+    //  vanilaSprite.transform.localScale.x =1;
 
-    void Start ()
+    void Start()
     {
-        MatrizInstance(posX,posY);
- //       MatrizInstance(posX-fijo,posY-fijo);
+        MatrizInstance(posX, posY);
+        //       MatrizInstance(posX-fijo,posY-fijo);
     }
 
 
     public class Mrx
-	{
-	    public int row { get; set; }
-	    public int col { get; set; }
-	    public string content { get; set; }
-	}
+    {
+        public int row { get; set; }
+        public int col { get; set; }
+        public int content { get; set; }
+    }
 
     void MatrizFull()
     {
-   	/* [{"row": 0, "col": 0, "content": "1"}, {"row": 0, "col": 1, "content": "1"}, 
-    	{"row": 0, "col": 2, "content": "3"}, {"row": 0, "col": 3, "content": "@"}, 
-    	{"row": 0, "col": 4, "content": "2"}, {"row": 1, "col": 0, "content": "2"}, 
-    	{"row": 1, "col": 1, "content": "@"}, {"row": 1, "col": 2, "content": "4"}, 
-    	{"row": 1, "col": 3, "content": "@"}, {"row": 1, "col": 4, "content": "2"}, 
-    	{"row": 2, "col": 0, "content": "3"}, {"row": 2, "col": 1, "content": "@"}, 
-    	{"row": 2, "col": 2, "content": "6"}, {"row": 2, "col": 3, "content": "3"}, 
-    	{"row": 2, "col": 4, "content": "2"}, {"row": 3, "col": 0, "content": "3"}, 
-    	{"row": 3, "col": 1, "content": "@"}, {"row": 3, "col": 2, "content": "@"}, 
-    	{"row": 3, "col": 3, "content": "@"}, {"row": 3, "col": 4, "content": "1"}, 
-    	{"row": 4, "col": 0, "content": "2"}, {"row": 4, "col": 1, "content": "@"}, 
-    	{"row": 4, "col": 2, "content": "4"}, {"row": 4, "col": 3, "content": "2"}, 
-    	{"row": 4, "col": 4, "content": "1"}]
-		*/
-    	string json = @"{
-		  'row': 'james@example.com',
-		  'col': true,
-		  'content': '2013-01-20T00:00:00Z',
-		}";	
+        string json = @"[{'row': 0, 'col': 0, 'content': 1}, {'row': 0, 'col': 1, 'content': 1}, 
+    	{'row': 0, 'col': 2, 'content': 3}, {'row': 0, 'col': 3, 'content': -1}, 
+    	{'row': 0, 'col': 4, 'content': 2}, {'row': 1, 'col': 0, 'content': 2}, 
+    	{'row': 1, 'col': 1, 'content': -1}, {'row': 1, 'col': 2, 'content': 4}, 
+    	{'row': 1, 'col': 3, 'content': -1}, {'row': 1, 'col': 4, 'content': 2}, 
+    	{'row': 2, 'col': 0, 'content': 3}, {'row': 2, 'col': 1, 'content': -1}, 
+    	{'row': 2, 'col': 2, 'content': 6}, {'row': 2, 'col': 3, 'content': 3}, 
+    	{'row': 2, 'col': 4, 'content': 2}, {'row': 3, 'col': 0, 'content': 3}, 
+    	{'row': 3, 'col': 1, 'content': -1}, {'row': 3, 'col': 2, 'content': -1}, 
+    	{'row': 3, 'col': 3, 'content': -1}, {'row': 3, 'col': 4, 'content': 1}, 
+    	{'row': 4, 'col': 0, 'content': 2}, {'row': 4, 'col': 1, 'content': -1}, 
+    	{'row': 4, 'col': 2, 'content': 4}, {'row': 4, 'col': 3, 'content': 2}, 
+    	{'row': 4, 'col': 4, 'content': 1}]";
 
-		Mrx account = JsonConvert.DeserializeObject<Mrx>(json);
+        
+        obj = JsonConvert.DeserializeObject<List<Mrx>>(json);
 
-        Debug.Log(account.content);
-
-
-		// Bad Boys
-
+        
+        Debug.Log(obj);
         //matriz que nos daran llena
-        for (int i = 0; i < fijo; i++)
+        
+        for (int i = 0; i < fijo * fijo; i++)
         {
-            for (int j = 0; j < fijo; j++)
-            {
-                int a =UnityEngine.Random.Range(0, 100);
-                if(a<minePercent)
-                {
-                    matrix[i,j] = -1;
-                }else
-                {
-                    matrix[i,j] = a;
-                }
-            }
+            Console.Write("asfsaf");
+          
+            matrix[obj[i].row, obj[i].col] = obj[i].content;
+            Debug.Log(0.0001);
+
+            Debug.Log(obj[i].col);
+            Debug.Log(obj[i].row);
+            Debug.Log(matrix[obj[i].row, obj[i].col]);
+            Debug.Log(0.1);
+
+
         }
     }
 
@@ -104,15 +98,11 @@ public class GameManager : MonoBehaviour
             CellMatrixLoop((i, j) =>
             {
                 Cell go = Instantiate(prefab,
-                    new Vector3(i - x -posx , j - y - posy ),
+                //    new Vector3(i - x -posx , j - y - posy ),
+                new Vector3(i , j ),
                     Quaternion.identity,
                     transform);//hacer una copia de un objeto y ponerlo en otro lugar 
                 go.name = string.Format("(X:{0},Y:{1})", i, j);
-                Debug.Log(0);
-
-                Debug.Log(x);
-
-                Debug.Log(y);
 
                 
                 cellMatrix[i, j] = go;
@@ -123,14 +113,14 @@ public class GameManager : MonoBehaviour
         {
             
             cellMatrix[i, j].Init(new Vector2Int(i, j),
-            ( matrix[i,j]> -1 ? false : true),
+            ( matrix[i,j]!=(-1) ? false : true),
             Activate);//el compilador entiende que los dos parametros son iguales
-                if(cellMatrix[i,j].mine)
+               /* if(cellMatrix[i,j].mine)
                 { 
                 Debug.Log(i);
                 Debug.Log(j);
                 Debug.Log(matrix[i,j]);
-                }
+                }*/
 
             cellMatrix[i, j].sprite = vanilaSprite;
         });
@@ -148,14 +138,14 @@ public class GameManager : MonoBehaviour
             // FAIL STATE
             //acaba el juego
             cellMatrix[i, j].sprite = mineSprite;
-            MatrizInstance(posX,posY);
+            MatrizInstance(posX, posY);
             //cuando se acaba el juego
         }
         else
         {
             cellMatrix[i, j].sprite = freeSprite;
             //si hay un campo libre de debe de hacer recursion para mostrar
-
+            /*
             if (ArroundCount(i, j) == 0)
             {
                 ActivateArround(i,j);
@@ -163,7 +153,9 @@ public class GameManager : MonoBehaviour
             else
             {
                 cellMatrix[i, j].text = ArroundCount(i, j).ToString();
-            }
+            }*/
+            cellMatrix[i, j].text = (obj[i * (fijo) + j].content).ToString();
+        
         }
     }
     void ActivateArround(int i, int j)
