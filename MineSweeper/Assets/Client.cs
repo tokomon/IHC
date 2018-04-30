@@ -17,8 +17,8 @@ public class Client : MonoBehaviour {
 	void Update () {
 		if (Input.GetKeyDown (KeyCode.Space) && connected)
 			playerInfo.sendFreeSpace (1, 1);
-		else if (Input.GetKeyDown (KeyCode.M) && connected)
-			playerInfo.mineGame ();
+		/*else if (Input.GetKeyDown (KeyCode.M) && connected)
+			playerInfo.mineGame ();*/
 		playerInfo.sendPosition ();
 	}
 }

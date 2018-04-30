@@ -39,8 +39,8 @@ namespace Interprete
         {
             if (Input.GetKeyDown(KeyCode.Space))
                 AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace(1, 1);
-            else if (Input.GetKeyDown(KeyCode.M))
-                AssemblyCSharp.PlayerInfo.Instance.mineGame();
+            /*else if (Input.GetKeyDown(KeyCode.M))
+                AssemblyCSharp.PlayerInfo.Instance.mineGame();*/
             AssemblyCSharp.PlayerInfo.Instance.sendPosition();
         }
         //Lista que se obtiene de leer el json
