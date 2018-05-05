@@ -7,7 +7,7 @@ using AssemblyCSharp;
 
 public class Escena : MonoBehaviour {
     public void cambiarescena(string nombre) {
-        bool data = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.137.151", 8888, 1);
+        bool data = AssemblyCSharp.PlayerInfo.Instance.startConnection("127.0.0.1", 1001, 1);
         if (data)
             SceneManager.LoadScene(1);
         else
