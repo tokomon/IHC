@@ -22,14 +22,14 @@ namespace AssemblyCSharp
 		public const int OPTION_POSITION_VALIDATION			= 7;
 		public const int OPTION_START						= 8;
 		public const int OPTION_UPDATE_PLAYER_POSITION		= 9;
-		public const int OPTION_FREE_SPACE					= 10;/*
+		public const int OPTION_FREE_SPACE					= 10;
 		public const int OPTION_SPACES						= 11;
-		public const int OPTION_NEW_MAP						= 12;
-		public const int OPTION_SEND_NEW_MAP				= 13;
-		public const int OPTION_READY						= 14;
-		public const int OPTION_START_AGAIN					= 15;*/
-
+		public const int OPTION_NOT_VALID					= 12;
+		//		public const int OPTION_SEND_NEW_MAP				= 13;
+		//		public const int OPTION_READY						= 14;
+		//		public const int OPTION_START_AGAIN					= 15;
 		public const int OPTION_GAME_FINISHED				= 20;
+		public const int OPTION_DISCONNECT					= 99;
 
 		public Socket socket;
 		public int sendPositionOption = 0;
@@ -38,29 +38,41 @@ namespace AssemblyCSharp
 
 		public int option;
 		public int player_id;
-		public int counter=40;
+
+		public int counter=20;
+
 		public int matrix_size;
-		public String map_data=null;
-		public int cantidad_liberados;
-		public String liberados;
+		public String map_data;
+
+		public int matrix_free_x;
+		public int matrix_free_y;
+
+		public int liberar_x;
+		public int liberar_y;
+
 		public int player_type;
 		public int player_winner;
 		public bool winner=false;
 		public bool read_winner=false;
+		public String message;
 
-        private static PlayerInfo instance = null;
+		public bool alertar_jugador = false;
+		public bool actualizar_map = false;
+		public bool alertar_forzado = false;
+
+		private static PlayerInfo instance = null;
 
 		public PlayerInfo (){
 		}
-        public static PlayerInfo Instance
-        {
-            get
-            {
-                if (instance == null)
-                    instance = new PlayerInfo();
-                return instance;
-            }
-        }
+		public static PlayerInfo Instance
+		{
+			get
+			{
+				if (instance == null)
+					instance = new PlayerInfo();
+				return instance;
+			}
+		}
 		public bool startConnection(String ip, int port,int type){
 			try {
 				read_winner=false;
@@ -91,6 +103,10 @@ namespace AssemblyCSharp
 			socket.Disconnect (false);
 			socket = null;
 			read_winner = false;
+			alertar_forzado = false;
+			actualizar_map = false;
+			alertar_jugador = false;
+			winner = false;
 		}
 		void sendString(Socket socket,String message){
 			try {
@@ -140,12 +156,23 @@ namespace AssemblyCSharp
 				{
 					startGame();
 					break;
-				}/*
+				}
 			case OPTION_SPACES: // PLAYER
 				{
-					updateMap();
+					while (actualizar_map) {
+					};
+					if (socket != null) {
+						liberar_x = matrix_free_x;
+						liberar_y = matrix_free_y;
+						actualizar_map = true;
+					}
 					break;
 				}
+			case OPTION_NOT_VALID: // PLAYER
+				{
+					alertar_jugador = true;
+					break;
+				}/*
 			case OPTION_SEND_NEW_MAP: // PLAYER
 				{
 					reloadMap ();
@@ -157,6 +184,11 @@ namespace AssemblyCSharp
 					startGameAgain();
 					break;
 				}*/
+			case OPTION_DISCONNECT:
+				{
+					alertar_forzado = true;
+					break;
+				}
 			case OPTION_GAME_FINISHED:
 				{
 					winner = player_winner != player_id;
@@ -195,9 +227,6 @@ namespace AssemblyCSharp
 			free.player_id = player_id;
 			sendString(socket,JsonUtility.ToJson(free));
 		}/*
-		void updateMap(){
-			// Actualizar Mapa
-		}
 		public void mineGame(){
 			// Mostrar Perdio y Esperando Nuevo Mapa
 			sendPositionOption = 3;
@@ -219,7 +248,7 @@ namespace AssemblyCSharp
 		}
 		public void sendPosition(){
 			TimeSpan elapsed = DateTime.Now - time;
-			if (sendPositionOption > 0 && elapsed.TotalMilliseconds > 500) {
+			if (sendPositionOption > 0 && elapsed.TotalMilliseconds > 1000) {
 				time = DateTime.Now;
 				PacketPosition position = new PacketPosition ();
 				switch (sendPositionOption) {
@@ -260,23 +289,27 @@ namespace AssemblyCSharp
 			receiveString(recData);
 			//workData
 			workData();
-			socket.BeginReceive(
-				_recieveBuffer,
-				0,
-				_recieveBuffer.Length,
-				SocketFlags.None,
-				new AsyncCallback(ReceiveCallback),
-				null
-			);
+			if (option != OPTION_GAME_FINISHED && option != OPTION_DISCONNECT) {
+				socket.BeginReceive (
+					_recieveBuffer,
+					0,
+					_recieveBuffer.Length,
+					SocketFlags.None,
+					new AsyncCallback (ReceiveCallback),
+					null
+				);
+			}
 		}
 		void receiveString(byte[] recData){
+			Debug.Log ("Me llego algo wey");
 			String str_size = System.Text.Encoding.ASCII.GetString (recData,0,4);
 			int json_size;
 			Int32.TryParse (str_size, out json_size);
+			Debug.LogFormat ("Json Size: {0}", json_size);
 			String json_str = System.Text.Encoding.ASCII.GetString (recData,4,json_size);
+			Debug.LogFormat ("Data: {0}", json_str.ToString());
 			JsonUtility.FromJsonOverwrite(json_str.ToString(), this);
 			Debug.LogFormat ("Recived Option: {0}", option);
-			Debug.LogFormat ("Data: {0}", json_str.ToString());
 		}
 	}
 }

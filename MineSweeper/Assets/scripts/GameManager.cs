@@ -36,12 +36,30 @@ namespace Interprete
 
         // Update is called once per frame
         void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-                AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace(1, 1);
-            /*else if (Input.GetKeyDown(KeyCode.M))
-                AssemblyCSharp.PlayerInfo.Instance.mineGame();*/
-            AssemblyCSharp.PlayerInfo.Instance.sendPosition();
+		{
+			if (Input.GetKeyDown (KeyCode.Space))//LLamar cuando selibera una posición
+				AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace (1, 1);//Pruebas Ignorar
+			else if (Input.GetKeyDown (KeyCode.W))
+				AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace (0, 0);//Pruebas Ignorar
+			else if (Input.GetKeyDown (KeyCode.L))
+				AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace (2, 2);//Pruebas Ignorar
+			else if ( AssemblyCSharp.PlayerInfo.Instance.read_winner) {//Cuando se conecta un ganador eliminar conexión y pasar a escenar de victoria o derrota
+				Debug.LogFormat ("Winner: {0}", AssemblyCSharp.PlayerInfo.Instance.player_winner);//player_winner si es el ID del ganador
+				AssemblyCSharp.PlayerInfo.Instance.endConnection (); //Borra conexión
+				Debug.Log ("Disconnected");
+			} else if (AssemblyCSharp.PlayerInfo.Instance.alertar_forzado) { // Cuando se te desconecta por X motivos
+				Debug.Log (AssemblyCSharp.PlayerInfo.Instance.message.ToString ()); //Mensaje a mostrar
+				AssemblyCSharp.PlayerInfo.Instance.endConnection (); //Eliminar conexión
+				Debug.Log ("Disconnected");
+			} else if (AssemblyCSharp.PlayerInfo.Instance.actualizar_map) {//Cuando se te da permiso de liberar
+				Debug.LogFormat ("Liberar X: {0}", AssemblyCSharp.PlayerInfo.Instance.liberar_x);
+				Debug.LogFormat ("Liberar Y: {0}", AssemblyCSharp.PlayerInfo.Instance.liberar_y);
+				AssemblyCSharp.PlayerInfo.Instance.actualizar_map = false;
+			} else if (AssemblyCSharp.PlayerInfo.Instance.alertar_jugador) {//Cuando NO se te da permiso de liberar
+				Debug.Log ("MAL PE");
+				AssemblyCSharp.PlayerInfo.Instance.alertar_jugador = false;
+			}
+			AssemblyCSharp.PlayerInfo.Instance.sendPosition ();//Siempre enviar posición del usuario
         }
         //Lista que se obtiene de leer el json
         public class MJson
