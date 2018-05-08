@@ -11,12 +11,15 @@ public class Client : MonoBehaviour {
 	void Start () {
 	}
 	// Update is called once per frame
-	void Update () {
-		if (Input.GetKeyDown (KeyCode.S) && !connected)
-			connected = AssemblyCSharp.PlayerInfo.Instance.startConnection ("127.0.0.1", 1001, 1);
-		//connected = AssemblyCSharp.PlayerInfo.Instance.startConnection ("192.168.43.177", 8803, 1);
-		//connected = AssemblyCSharp.PlayerInfo.Instance.startConnection ("192.168.43.177", 5000, 1);
-		else if (Input.GetKeyDown (KeyCode.Space) && connected)
+	void Update ()
+    {
+        if (Input.GetKeyDown(KeyCode.S) && !connected)
+            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.43.58", 8888, 1);
+        else if (Input.GetKeyDown(KeyCode.Q) && !connected)
+            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.43.177", 8000, 1);
+        //connected = AssemblyCSharp.PlayerInfo.Instance.startConnection ("192.168.43.177", 8803, 1);
+        //connected = AssemblyCSharp.PlayerInfo.Instance.startConnection ("192.168.43.177", 5000, 1);
+        else if (Input.GetKeyDown (KeyCode.Space) && connected)
 			AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace (1, 1);
 		else if (Input.GetKeyDown (KeyCode.W) && connected)
 			AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace (0, 0);

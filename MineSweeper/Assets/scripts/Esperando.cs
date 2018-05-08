@@ -14,8 +14,9 @@ public class Esperando : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         Debug.Log("ijgiu");
-        if (AssemblyCSharp.PlayerInfo.Instance.option != 3)
-            SceneManager.LoadScene(2);
+        if (AssemblyCSharp.PlayerInfo.Instance.option != 8)
+            SceneManager.LoadScene(3);
+        AssemblyCSharp.PlayerInfo.Instance.sendPosition();
 
     }
 }

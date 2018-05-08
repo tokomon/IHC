@@ -3,19 +3,19 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
 using AssemblyCSharp;
+using UnityEngine.SceneManagement;
 
 namespace Interprete
 {
     public class GameManager : MonoBehaviour
     {
-        const int fijo = 5;//tamaño de los tableros
-        int x = fijo;
-        int y = fijo;
+        int x = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
+        int y = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
         int posX = 0, posY = 0;
         List<MJson> obj;
         //lista que lee el JSON
         //hacer 3d
-        double[,] matrix = new double[fijo, fijo];//matriz que se debe de dibujar
+        double[,] matrix = new double[AssemblyCSharp.PlayerInfo.Instance.matrix_size, AssemblyCSharp.PlayerInfo.Instance.matrix_size];//matriz que se debe de dibujar
         public Cell prefab;
 
         public Sprite vanilaSprite;//valor no descubierto
@@ -26,9 +26,9 @@ namespace Interprete
         void Start()
         {
             TableroInstance(posX, posY);
-            TableroInstance(posX - (fijo + 1), posY - (fijo + 1));
-            TableroInstance(posX, posY - (fijo + 1));
-            TableroInstance(posX - (fijo + 1), posY);
+            TableroInstance(posX - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), posY - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1));
+            TableroInstance(posX, posY - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1));
+            TableroInstance(posX - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), posY);
             //todos los tableros empiezan en 0.0 de la esquina izq de abajo
             //se tendria que cambiar para que empiecen en cada esquina de los cuadrados
             //es decir (0,0) (n,n) (n,n) (n,n)
@@ -45,6 +45,12 @@ namespace Interprete
 				AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace (2, 2);//Pruebas Ignorar
 			else if ( AssemblyCSharp.PlayerInfo.Instance.read_winner) {//Cuando se conecta un ganador eliminar conexión y pasar a escenar de victoria o derrota
 				Debug.LogFormat ("Winner: {0}", AssemblyCSharp.PlayerInfo.Instance.player_winner);//player_winner si es el ID del ganador
+                if(AssemblyCSharp.PlayerInfo.Instance.player_id == AssemblyCSharp.PlayerInfo.Instance.player_winner){
+                    SceneManager.LoadScene(4);
+                }
+                else{
+                    SceneManager.LoadScene(5);
+                }
 				AssemblyCSharp.PlayerInfo.Instance.endConnection (); //Borra conexión
 				Debug.Log ("Disconnected");
 			} else if (AssemblyCSharp.PlayerInfo.Instance.alertar_forzado) { // Cuando se te desconecta por X motivos
@@ -54,6 +60,7 @@ namespace Interprete
 			} else if (AssemblyCSharp.PlayerInfo.Instance.actualizar_map) {//Cuando se te da permiso de liberar
 				Debug.LogFormat ("Liberar X: {0}", AssemblyCSharp.PlayerInfo.Instance.liberar_x);
 				Debug.LogFormat ("Liberar Y: {0}", AssemblyCSharp.PlayerInfo.Instance.liberar_y);
+
 				AssemblyCSharp.PlayerInfo.Instance.actualizar_map = false;
 			} else if (AssemblyCSharp.PlayerInfo.Instance.alertar_jugador) {//Cuando NO se te da permiso de liberar
 				Debug.Log ("MAL PE");
@@ -236,7 +243,7 @@ namespace Interprete
             
             obj = JsonConvert.DeserializeObject<List<MJson>>(data);
 
-            for (int i = 0; i < fijo * fijo; i++)
+            for (int i = 0; i < AssemblyCSharp.PlayerInfo.Instance.matrix_size  * AssemblyCSharp.PlayerInfo.Instance.matrix_size; i++)
             {
                 matrix[obj[i].row, obj[i].col] = obj[i].content;
             }
