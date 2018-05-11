@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -6,22 +8,28 @@ using UnityEngine.SceneManagement;
 
 public class tablero : MonoBehaviour
 {
-    public int NumberOfColumns = 5; // number of columns for the grid
-    public int NumberOfRows = 5; // number of rows for the grid
+    public int x = AssemblyCSharp.PlayerInfo.Instance.matrix_size; // number of columns for the grid
+    public int y = AssemblyCSharp.PlayerInfo.Instance.matrix_size; // number of rows for the grid
     public float SeperationValueX = 0.001f; // Distance between each column
     public float SeperationValueZ = 0.001f; // Distance between each Row
 
     public float tempSepX = 0; // used to calculate the separation between each column
     public float tempSepZ = 0;// used to calculate the separation between each row
-    double[,] matrix = new double[5, 5];//matriz que se debe de dibujar
+    double[,] matrix = new double[AssemblyCSharp.PlayerInfo.Instance.matrix_size, AssemblyCSharp.PlayerInfo.Instance.matrix_size];//matriz que se debe de dibujar
     public Texture3D texture;
     public Material paredMat;
     public Material pisoMat;
+    public Cell prefab;
 
     public static Material matPiso;
     public static Material matPared;
 
+    int posX = 0, posY = 0;
+    List<MJson> obj;
 
+    public Sprite vanilaSprite;//valor no descubierto
+    public Sprite mineSprite;//mina
+    public Sprite freeSprite;//espacio presionado
 
     // Use this for initialization
     void Start()
@@ -76,20 +84,218 @@ public class tablero : MonoBehaviour
         AssemblyCSharp.PlayerInfo.Instance.sendPosition();//Siempre enviar posición del usuario
     }
 
+    public class Tablero
+    {
+        public int posX, posY;
+        public double[,] matrix; //matriz que se debe copiar
+        public Cell[,] cellMatrix;
+
+        public Sprite free;
+        public Sprite bomb;
+        public Sprite full;
+
+        //para poder usar los sprites definidos arriba
+        public void changeSpriteFree(Sprite free_)
+        {
+            free = free_;
+        }
+        public void changeSpriteBomb(Sprite bomb_)
+        {
+            bomb = bomb_;
+        }
+        public void changeSpriteFull(Sprite full_)
+        {
+            full = full_;
+        }
+        /****************************************/
+        public Tablero(int x, int y, Sprite mine, Sprite full, Sprite free)
+        {
+            posX = x;
+            posY = y;
+            changeSpriteFree(free);
+            changeSpriteBomb(mine);
+            changeSpriteFull(full);
+        }
+
+        public void init()
+        { //dibuja la matriz desde el inicio
+            CellMatrixLoop((i, j) =>
+            {
+                cellMatrix[i, j].Init(new Vector2Int(i, j),
+                (matrix[i, j] != (-1) ? false : true),
+                Activate);
+                cellMatrix[i, j].sprite = full;
+            });
+        }
+
+        //funcion para onclick
+        void Activate(int i, int j)
+        {
+            if (cellMatrix[i, j].showed)
+                return;
+            cellMatrix[i, j].showed = true;
+
+            if (cellMatrix[i, j].mine)
+            {
+                //acaba el juego
+                cellMatrix[i, j].sprite = bomb;
+                Debug.Log("Mina");
+                //StartCoroutine(your_timer()); //Delay
+                init();
+                //volver a jugar
+            }
+            else
+            {
+                cellMatrix[i, j].sprite = free;
+                //si hay un campo libre de debe de hacer recursion para mostrar
+                /*
+                if (ArroundCount(i, j) == 0)
+                {
+                    ActivateArround(i,j);
+                }
+                else
+                {
+                    cellMatrix[i, j].text = ArroundCount(i, j).ToString();
+                }*/
+                cellMatrix[i, j].text = (matrix[i, j]).ToString();
+
+            }
+        }
+        void ActivateArround(int i, int j)
+        {
+            if (PointIsInsideMatrix(i + 1, j))
+                Activate(i + 1, j);
+            if (PointIsInsideMatrix(i, j + 1))
+                Activate(i, j + 1);
+            if (PointIsInsideMatrix(i + 1, j + 1))
+                Activate(i + 1, j + 1);
+            if (PointIsInsideMatrix(i - 1, j))
+                Activate(i - 1, j);
+            if (PointIsInsideMatrix(i, j - 1))
+                Activate(i, j - 1);
+            if (PointIsInsideMatrix(i - 1, j - 1))
+                Activate(i - 1, j - 1);
+            if (PointIsInsideMatrix(i - 1, j + 1))
+                Activate(i - 1, j + 1);
+            if (PointIsInsideMatrix(i + 1, j - 1))
+                Activate(i + 1, j - 1);
+        }
+        public void CellMatrixLoop(Action<int, int> e)//recibir en un parametro una funcion
+        {
+            for (int i = 0; i < cellMatrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < cellMatrix.GetLength(1); j++)
+                {
+                    e(i, j);//esta funcion dibujara el cuadrado
+                }
+            }
+        }
+        bool PointIsInsideMatrix(int i, int j)
+        {
+            if (i >= cellMatrix.GetLength(0))
+                return false;
+            if (i < 0)
+                return false;
+            if (j >= cellMatrix.GetLength(1))
+                return false;
+            if (j < 0)
+                return false;
+
+            return true;
+        }
+        int ArroundCount(int i, int j)
+        {
+
+            int arround = 0;
+
+            if (PointIsInsideMatrix(i + 1, j) && cellMatrix[i + 1, j].mine)
+                arround++;
+            if (PointIsInsideMatrix(i, j + 1) && cellMatrix[i, j + 1].mine)
+                arround++;
+            if (PointIsInsideMatrix(i + 1, j + 1) && cellMatrix[i + 1, j + 1].mine)
+                arround++;
+            if (PointIsInsideMatrix(i - 1, j) && cellMatrix[i - 1, j].mine)
+                arround++;
+            if (PointIsInsideMatrix(i, j - 1) && cellMatrix[i, j - 1].mine)
+                arround++;
+            if (PointIsInsideMatrix(i - 1, j - 1) && cellMatrix[i - 1, j - 1].mine)
+                arround++;
+            if (PointIsInsideMatrix(i - 1, j + 1) && cellMatrix[i - 1, j + 1].mine)
+                arround++;
+            if (PointIsInsideMatrix(i + 1, j - 1) && cellMatrix[i + 1, j - 1].mine)
+                arround++;
+
+            return arround;
+        }
+    }
+
+    public class MJson
+    {
+        public int row { get; set; }
+        public int col { get; set; }
+        public int content { get; set; }
+    }
+
     void jsonToMatriz()
     {
-        matrix = new double[,] { { 1, 1, 3, -1, 2 }, { 2, -1, 4, -1, 2 }, 
-                              { 3, -1, 6, 3, 2 }, { 3, -1, -1, -1, 1 },
-                              { 2, -1, 4, 2, 1 } };
+        string json = @"[{'row': 0, 'col': 0, 'content': 1}, {'row': 0, 'col': 1, 'content': 1}, 
+    	{'row': 0, 'col': 2, 'content': 3}, {'row': 0, 'col': 3, 'content': -1}, 
+    	{'row': 0, 'col': 4, 'content': 2}, {'row': 1, 'col': 0, 'content': 2}, 
+    	{'row': 1, 'col': 1, 'content': -1}, {'row': 1, 'col': 2, 'content': 4}, 
+    	{'row': 1, 'col': 3, 'content': -1}, {'row': 1, 'col': 4, 'content': 2}, 
+    	{'row': 2, 'col': 0, 'content': 3}, {'row': 2, 'col': 1, 'content': -1}, 
+    	{'row': 2, 'col': 2, 'content': 6}, {'row': 2, 'col': 3, 'content': 3}, 
+    	{'row': 2, 'col': 4, 'content': 2}, {'row': 3, 'col': 0, 'content': 3}, 
+    	{'row': 3, 'col': 1, 'content': -1}, {'row': 3, 'col': 2, 'content': -1}, 
+    	{'row': 3, 'col': 3, 'content': -1}, {'row': 3, 'col': 4, 'content': 1}, 
+    	{'row': 4, 'col': 0, 'content': 2}, {'row': 4, 'col': 1, 'content': -1}, 
+    	{'row': 4, 'col': 2, 'content': 4}, {'row': 4, 'col': 3, 'content': 2}, 
+    	{'row': 4, 'col': 4, 'content': 1}]";
+
+        while (AssemblyCSharp.PlayerInfo.Instance.map_data == null) ;
+        String data = AssemblyCSharp.PlayerInfo.Instance.map_data;
+        Debug.Log(data.ToString());
+
+        obj = JsonConvert.DeserializeObject<List<MJson>>(data);
+
+        for (int i = 0; i < AssemblyCSharp.PlayerInfo.Instance.matrix_size * AssemblyCSharp.PlayerInfo.Instance.matrix_size; i++)
+        {
+            matrix[obj[i].row, obj[i].col] = obj[i].content;
+        }
+    }
+
+    void TableroInstance(int posx, int posy)
+    {
+        Tablero matriz = new Tablero(posx, posy, mineSprite, vanilaSprite, freeSprite);
+        jsonToMatriz();//llenamos la matriz con la data del json
+        matriz.matrix = matrix;
+
+        if (matriz.cellMatrix == null)
+        {
+            matriz.cellMatrix = new Cell[x, y];//crea un objeto matriz con 2 dimensiones
+            matriz.CellMatrixLoop((i, j) =>
+            {
+                Cell go = Instantiate(prefab,
+                    new Vector3(i + posx, j + posy),
+                    Quaternion.identity,
+                    transform);
+                //hace una copia de un objeto y ponerlo en otro lugar 
+                go.name = string.Format("(X:{0},Y:{1})", i, j);
+
+                matriz.cellMatrix[i, j] = go;
+            });
+        }
+        matriz.init();
+
     }
 
     void createGrid()
     {
         jsonToMatriz();
 
-        for (float i = 0; i < NumberOfColumns; i += 1.05f)
+        for (float i = 0; i < x; i += 1.05f)
         {//loop 1 to loop through columns
-            for (float j = 0; j < NumberOfRows; j += 1.05f)
+            for (float j = 0; j < y; j += 1.05f)
             {//loop 2 to loop through rows
              //   Debug.Log(j);
                 GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Cube); //create a quad primitive as provided by unity
