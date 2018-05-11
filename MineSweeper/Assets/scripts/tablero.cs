@@ -26,6 +26,7 @@ public class tablero : MonoBehaviour
 
     int posX = 0, posY = 0;
     List<MJson> obj;
+    GameObject gmo;
 
     public Sprite vanilaSprite;//valor no descubierto
     public Sprite mineSprite;//mina
@@ -73,7 +74,20 @@ public class tablero : MonoBehaviour
         {//Cuando se te da permiso de liberar
             Debug.LogFormat("Liberar X: {0}", AssemblyCSharp.PlayerInfo.Instance.liberar_x);
             Debug.LogFormat("Liberar Y: {0}", AssemblyCSharp.PlayerInfo.Instance.liberar_y);
-            ///findbytag para borrar !!!
+            double pared = matrix[AssemblyCSharp.PlayerInfo.Instance.liberar_x, AssemblyCSharp.PlayerInfo.Instance.liberar_y];
+            gmo = GameObject.Find(AssemblyCSharp.PlayerInfo.Instance.liberar_x.ToString() + " " + AssemblyCSharp.PlayerInfo.Instance.liberar_y.ToString() + " " + pared.ToString());
+
+            if (gmo.name[gmo.name.Length - 1] != '1')
+            {
+                Destroy(gmo);
+                // this.GetComponent<Renderer>().material = tablero.matPiso;
+                //  gameObject.GetComponent<Renderer>().enabled = false;
+            }
+            else
+            {
+                this.GetComponent<Renderer>().material = tablero.matPared;
+            }
+
             AssemblyCSharp.PlayerInfo.Instance.actualizar_map = false;
         }
         else if (AssemblyCSharp.PlayerInfo.Instance.alertar_jugador)
@@ -261,6 +275,10 @@ public class tablero : MonoBehaviour
         for (int i = 0; i < AssemblyCSharp.PlayerInfo.Instance.matrix_size * AssemblyCSharp.PlayerInfo.Instance.matrix_size; i++)
         {
             matrix[obj[i].row, obj[i].col] = obj[i].content;
+
+            Debug.LogFormat("X: {0}",obj[i].row );
+            Debug.LogFormat("Y: {0}", obj[i].col);
+            Debug.LogFormat("Value: {0}", obj[i].content);
         }
     }
 
@@ -310,7 +328,7 @@ public class tablero : MonoBehaviour
                 //   Debug.Log(newMat);
                 if (matrix[(int)i,(int)j] <0)
                 {
-                    plane.name = i.ToString() + " " + j.ToString()+ " 1";
+                    plane.name = ((int)i).ToString() + " " + ((int)j).ToString()+ " 1";
                     //plane.renderer.material = newMat;
 
                //     plane.GetComponent<Renderer>().material.mainTexture = texture;
@@ -323,7 +341,8 @@ public class tablero : MonoBehaviour
 
                 }
                 else{
-               //     plane.GetComponent<Renderer>().enabled = false;
+                    plane.name = ((int)i).ToString() + " " + ((int)j).ToString() + " 0";
+                    //     plane.GetComponent<Renderer>().enabled = false;
                 }
               //  plane.AddComponent<MaterialChange>();
 

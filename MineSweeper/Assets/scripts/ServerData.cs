@@ -39,7 +39,7 @@ namespace AssemblyCSharp
 		public int option;
 		public int player_id;
 
-		public int counter=20;
+		public int counter=5;
 
 		public int matrix_size;
 		public String map_data;

@@ -14,11 +14,11 @@ public class Escena : MonoBehaviour {
         int puerto;
         Int32.TryParse(PuertoField.text, out puerto);
 
-        int opcion = 1;
+        int opcion = 0;
         Toggle optoggle = (Toggle)GameObject.Find("Opcion").GetComponent<Toggle>();
 
         if (optoggle.isOn)
-            opcion = 2;
+            opcion = 1;
 
         bool data = AssemblyCSharp.PlayerInfo.Instance.startConnection(IPField.text, puerto, opcion);
 
