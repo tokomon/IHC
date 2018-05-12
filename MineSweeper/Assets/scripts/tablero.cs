@@ -24,9 +24,8 @@ public class tablero : MonoBehaviour
     public static Material matPiso;
     public static Material matPared;
 
-    int posX = 0, posY = 0;
     List<MJson> obj;
-    GameObject gmo;
+	public GameObject gmo = null;
 
     public Sprite vanilaSprite;//valor no descubierto
     public Sprite mineSprite;//mina
@@ -75,17 +74,17 @@ public class tablero : MonoBehaviour
             Debug.LogFormat("Liberar X: {0}", AssemblyCSharp.PlayerInfo.Instance.liberar_x);
             Debug.LogFormat("Liberar Y: {0}", AssemblyCSharp.PlayerInfo.Instance.liberar_y);
             double pared = matrix[AssemblyCSharp.PlayerInfo.Instance.liberar_x, AssemblyCSharp.PlayerInfo.Instance.liberar_y];
-            gmo = GameObject.Find(AssemblyCSharp.PlayerInfo.Instance.liberar_x.ToString() + " " + AssemblyCSharp.PlayerInfo.Instance.liberar_y.ToString() + " " + pared.ToString());
-
-            if (gmo.name[gmo.name.Length - 1] != '1')
-            {
-                Destroy(gmo);
-                // this.GetComponent<Renderer>().material = tablero.matPiso;
-                //  gameObject.GetComponent<Renderer>().enabled = false;
+			string pname = AssemblyCSharp.PlayerInfo.Instance.liberar_x.ToString () + " " + AssemblyCSharp.PlayerInfo.Instance.liberar_y.ToString () + " " + pared.ToString ();
+            gmo = GameObject.Find(pname);
+            if (pared == 1)
+			{
+				//this.GetComponent<Renderer>().material = tablero.matPared;
             }
             else
-            {
-                this.GetComponent<Renderer>().material = tablero.matPared;
+			{
+				Destroy(gmo);
+				// this.GetComponent<Renderer>().material = tablero.matPiso;
+				//  gameObject.GetComponent<Renderer>().enabled = false;
             }
 
             AssemblyCSharp.PlayerInfo.Instance.actualizar_map = false;
@@ -252,7 +251,7 @@ public class tablero : MonoBehaviour
 
     void jsonToMatriz()
     {
-        string json = @"[{'row': 0, 'col': 0, 'content': 1}, {'row': 0, 'col': 1, 'content': 1}, 
+        /*string json = @"[{'row': 0, 'col': 0, 'content': 1}, {'row': 0, 'col': 1, 'content': 1}, 
     	{'row': 0, 'col': 2, 'content': 3}, {'row': 0, 'col': 3, 'content': -1}, 
     	{'row': 0, 'col': 4, 'content': 2}, {'row': 1, 'col': 0, 'content': 2}, 
     	{'row': 1, 'col': 1, 'content': -1}, {'row': 1, 'col': 2, 'content': 4}, 
@@ -264,7 +263,7 @@ public class tablero : MonoBehaviour
     	{'row': 3, 'col': 3, 'content': -1}, {'row': 3, 'col': 4, 'content': 1}, 
     	{'row': 4, 'col': 0, 'content': 2}, {'row': 4, 'col': 1, 'content': -1}, 
     	{'row': 4, 'col': 2, 'content': 4}, {'row': 4, 'col': 3, 'content': 2}, 
-    	{'row': 4, 'col': 4, 'content': 1}]";
+    	{'row': 4, 'col': 4, 'content': 1}]";*/
 
         while (AssemblyCSharp.PlayerInfo.Instance.map_data == null) ;
         String data = AssemblyCSharp.PlayerInfo.Instance.map_data;
@@ -311,13 +310,15 @@ public class tablero : MonoBehaviour
     {
         jsonToMatriz();
 
-        for (float i = 0; i < x; i += 1.05f)
+        for (float i = 0; i < x; i += 1)
         {//loop 1 to loop through columns
-            for (float j = 0; j < y; j += 1.05f)
+            for (float j = 0; j < y; j += 1)
             {//loop 2 to loop through rows
              //   Debug.Log(j);
+				if (j == 0 && i == 0)
+					continue;
                 GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Cube); //create a quad primitive as provided by unity
-                plane.transform.position = new Vector3(i, 0, j); //position the newly created quad accordingly
+                plane.transform.position = new Vector3(i * 1.05f, 0, 1.05f * j); //position the newly created quad accordingly
                 plane.transform.eulerAngles = new Vector3(90f, 0, 0); //rotate the quads 90 degrees in X to face up
           //      plane.name = i.ToString() + " " + j.ToString();
 
@@ -326,9 +327,7 @@ public class tablero : MonoBehaviour
             */    
 
                 //   Debug.Log(newMat);
-                if (matrix[(int)i,(int)j] <0)
-                {
-                    plane.name = ((int)i).ToString() + " " + ((int)j).ToString()+ " 1";
+				plane.name = ((int)i).ToString() + " " + ((int)j).ToString()+ " " + ((int)matrix[(int)i,(int)j]).ToString();
                     //plane.renderer.material = newMat;
 
                //     plane.GetComponent<Renderer>().material.mainTexture = texture;
@@ -339,11 +338,7 @@ public class tablero : MonoBehaviour
                     */
             //        Debug.Log(10)
 
-                }
-                else{
-                    plane.name = ((int)i).ToString() + " " + ((int)j).ToString() + " 0";
                     //     plane.GetComponent<Renderer>().enabled = false;
-                }
               //  plane.AddComponent<MaterialChange>();
 
                 plane.AddComponent<Hide>();

@@ -222,7 +222,7 @@ namespace Interprete
         }
 
         void jsonToMatriz()
-        {
+        {/*
             string json = @"[{'row': 0, 'col': 0, 'content': 1}, {'row': 0, 'col': 1, 'content': 1}, 
     	{'row': 0, 'col': 2, 'content': 3}, {'row': 0, 'col': 3, 'content': -1}, 
     	{'row': 0, 'col': 4, 'content': 2}, {'row': 1, 'col': 0, 'content': 2}, 
@@ -235,7 +235,7 @@ namespace Interprete
     	{'row': 3, 'col': 3, 'content': -1}, {'row': 3, 'col': 4, 'content': 1}, 
     	{'row': 4, 'col': 0, 'content': 2}, {'row': 4, 'col': 1, 'content': -1}, 
     	{'row': 4, 'col': 2, 'content': 4}, {'row': 4, 'col': 3, 'content': 2}, 
-    	{'row': 4, 'col': 4, 'content': 1}]";
+    	{'row': 4, 'col': 4, 'content': 1}]";*/
 
             while (AssemblyCSharp.PlayerInfo.Instance.map_data == null);
             String data = AssemblyCSharp.PlayerInfo.Instance.map_data;

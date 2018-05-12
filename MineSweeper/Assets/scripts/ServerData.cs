@@ -47,6 +47,9 @@ namespace AssemblyCSharp
 		public int matrix_free_x;
 		public int matrix_free_y;
 
+		public int pos_x;
+		public int pos_y;
+
 		public int liberar_x;
 		public int liberar_y;
 
@@ -226,6 +229,8 @@ namespace AssemblyCSharp
 			free.matrix_free_y = free_y;
 			free.player_id = player_id;
 			sendString(socket,JsonUtility.ToJson(free));
+			pos_x = free_x;
+			pos_y = free_y;
 		}/*
 		public void mineGame(){
 			// Mostrar Perdio y Esperando Nuevo Mapa
@@ -254,6 +259,7 @@ namespace AssemblyCSharp
 				switch (sendPositionOption) {
 				case 1:
 					position.option = OPTION_PLAYER_POSITION;
+					pos_x = counter;
 					counter = counter - 1;
 					break;
 				case 2:
@@ -264,8 +270,8 @@ namespace AssemblyCSharp
 					break;*/
 				}
 				position.player_id = player_id;
-				position.matrix_pos_x = counter;
-				position.matrix_pos_y = 0;
+				position.matrix_pos_x = pos_x;
+				position.matrix_pos_y = pos_y;
 				sendString (socket, JsonUtility.ToJson (position));
 			}
 		}/*
