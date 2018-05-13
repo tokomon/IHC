@@ -11,7 +11,6 @@ public class MaterialChange : MonoBehaviour {
     {
         rend = GetComponent<Renderer>();
         //rend.enabled = true;
-        Texture3D texture = (Texture3D)Resources.Load("Assets/textures/piso");
         Material newMat = Resources.Load("Assets/Materials/piso", typeof(Material)) as Material;
         //Debug.Log(newMat);
 

@@ -46,10 +46,10 @@ namespace Interprete
 			else if ( AssemblyCSharp.PlayerInfo.Instance.read_winner) {//Cuando se conecta un ganador eliminar conexión y pasar a escenar de victoria o derrota
 				Debug.LogFormat ("Winner: {0}", AssemblyCSharp.PlayerInfo.Instance.player_winner);//player_winner si es el ID del ganador
                 if(AssemblyCSharp.PlayerInfo.Instance.player_id == AssemblyCSharp.PlayerInfo.Instance.player_winner){
-                    SceneManager.LoadScene(4);
+                    SceneManager.LoadScene(5);
                 }
                 else{
-                    SceneManager.LoadScene(5);
+                    SceneManager.LoadScene(6);
                 }
 				AssemblyCSharp.PlayerInfo.Instance.endConnection (); //Borra conexión
 				Debug.Log ("Disconnected");
