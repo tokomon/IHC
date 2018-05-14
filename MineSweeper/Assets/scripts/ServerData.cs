@@ -133,29 +133,32 @@ namespace AssemblyCSharp
 		private void freeQueueReadQueue(){
 			flagQueue = false;
 		}
+		private void addJugada(){
+			canQueueReadQueue();
+			listaJugadas.Enqueue (new Vector3 (liberar_x, liberar_y, player_id));
+			freeQueueReadQueue();
+		}
 		private void readJugadas (){
-			if(jugadas.Length > 0){
-				canQueueReadQueue();
-				try{
-					string[] datos = jugadas.Split ('&');
-					for (int i = 0; i < datos.Length; i += 3) {
-						if(i + 2 < datos.Length){
-							int player_id = 0;
-							int x;
-							int y;
-							bool value = Int32.TryParse (datos [i], out player_id);
-							value &= Int32.TryParse (datos [i+1], out x);
-							value &= Int32.TryParse (datos [i+2], out y);
-							if(value)
-								listaJugadas.Enqueue (new Vector3 (x, y, player_id));
-						}
+			canQueueReadQueue();
+			try{
+				string[] datos = jugadas.Split ('&');
+				for (int i = 0; i < datos.Length; i += 3) {
+					if(i + 2 < datos.Length){
+						int player_id = 0;
+						int x;
+						int y;
+						bool value = Int32.TryParse (datos [i], out player_id);
+						value &= Int32.TryParse (datos [i+1], out x);
+						value &= Int32.TryParse (datos [i+2], out y);
+						if(value)
+							listaJugadas.Enqueue (new Vector3 (x, y, player_id));
 					}
 				}
-				catch(Exception ex){
-					Debug.Log (ex.Message);
-				};
-				freeQueueReadQueue();
 			}
+			catch(Exception ex){
+				Debug.Log (ex.Message);
+			};
+			freeQueueReadQueue();
 		}
 		public bool hayJugada()
 		{
@@ -253,7 +256,7 @@ namespace AssemblyCSharp
 				}
 			case OPTION_SPECTATOR_JUGADAS: // SPECTATOR
 				{
-					readJugadas ();
+					addJugada ();
 					break;
 				}
 			case OPTION_DISCONNECT:
