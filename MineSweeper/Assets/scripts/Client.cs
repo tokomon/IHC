@@ -14,9 +14,11 @@ public class Client : MonoBehaviour {
 	void Update ()
     {
         if (Input.GetKeyDown(KeyCode.S) && !connected)
-            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.43.58", 8888, 1);
+            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.137.151", 8889, 1);
         else if (Input.GetKeyDown(KeyCode.Q) && !connected)
-            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.43.177", 8000, 1);
+            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.137.151", 8888, 1);
+        /*else if (Input.GetKeyDown(KeyCode.Q) && !connected)
+            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.43.177", 8000, 1);*/
         //connected = AssemblyCSharp.PlayerInfo.Instance.startConnection ("192.168.43.177", 8803, 1);
         //connected = AssemblyCSharp.PlayerInfo.Instance.startConnection ("192.168.43.177", 5000, 1);
         else if (Input.GetKeyDown (KeyCode.Space) && connected)
@@ -42,6 +44,11 @@ public class Client : MonoBehaviour {
 		} else if (AssemblyCSharp.PlayerInfo.Instance.alertar_jugador) {
 			Debug.Log ("MAL PE");
 			AssemblyCSharp.PlayerInfo.Instance.alertar_jugador = false;
+		}
+		if (connected && AssemblyCSharp.PlayerInfo.Instance.hayJugada ()) {
+			Vector3 jugada = AssemblyCSharp.PlayerInfo.Instance.get_jugada ();
+			Debug.Log (jugada.ToString ());
+			// Liberar esa jugada donde jugada.x es X, jugada.y es Y y jugada.z es el ID del jugador.
 		}
 		AssemblyCSharp.PlayerInfo.Instance.sendPosition ();
 		/*else if (Input.GetKeyDown (KeyCode.M) && connected)

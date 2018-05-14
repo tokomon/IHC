@@ -25,10 +25,10 @@ namespace Interprete
 
         void Start()
         {
-            TableroInstance(posX, posY);
+            /*TableroInstance(posX, posY);
             TableroInstance(posX - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), posY - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1));
             TableroInstance(posX, posY - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1));
-            TableroInstance(posX - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), posY);
+            TableroInstance(posX - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), posY);*/
             //todos los tableros empiezan en 0.0 de la esquina izq de abajo
             //se tendria que cambiar para que empiecen en cada esquina de los cuadrados
             //es decir (0,0) (n,n) (n,n) (n,n)
@@ -46,6 +46,7 @@ namespace Interprete
 			}
 			if (AssemblyCSharp.PlayerInfo.Instance.hayJugada ()) {
 				Vector3 jugada = AssemblyCSharp.PlayerInfo.Instance.get_jugada ();
+				Debug.Log (jugada.ToString ());
 				// Liberar esa jugada donde jugada.x es X, jugada.y es Y y jugada.z es el ID del jugador.
 			}
         }

@@ -175,6 +175,11 @@ namespace AssemblyCSharp
 			flagQueue = false;
 			read_map=false;
 			sendPositionOption = 0;
+			int i=0;
+			sendDisconnect();
+			while(i<1000000){
+				++i;
+			}
 			socket.Disconnect (false);
 			socket = null;
 			read_winner = false;
@@ -251,6 +256,8 @@ namespace AssemblyCSharp
 			case OPTION_MAPS_SPECTATOR: // SPECTATOR
 				{
 					read_map = true;
+					Debug.LogFormat ("Size: {0}", matrix_size.ToString());
+					Debug.LogFormat ("Map: {0}", maps_data.ToString());
 					readJugadas ();
 					break;
 				}
@@ -333,7 +340,8 @@ namespace AssemblyCSharp
 				case 1:
 					position.option = OPTION_PLAYER_POSITION;
 					pos_x = counter;
-					counter = counter - 1;
+					if(counter > 0)
+						counter = counter - 1;
 					break;
 				case 2:
 					position.option = OPTION_UPDATE_PLAYER_POSITION;
@@ -347,13 +355,12 @@ namespace AssemblyCSharp
 				position.matrix_pos_y = pos_y;
 				sendString (socket, JsonUtility.ToJson (position));
 			}
-		}/*
-		void sendReady(){
+		}
+		void sendDisconnect(){
 			PacketSimple ready = new PacketSimple ();
-			ready.option= OPTION_READY;
-			ready.player_id = player_id;
+			ready.option= OPTION_DISCONNECT;
 			sendString(socket,JsonUtility.ToJson(ready));
-		}*/
+		}
 		// RECV
 		private void ReceiveCallback(IAsyncResult AR){
 			//Check how much bytes are recieved and call EndRecieve to finalize handshake

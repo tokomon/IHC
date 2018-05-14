@@ -15,7 +15,7 @@ public class EsperandoObs : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        if (AssemblyCSharp.PlayerInfo.Instance.read_map)
+        if (AssemblyCSharp.PlayerInfo.Instance.read_map && AssemblyCSharp.PlayerInfo.Instance.option >= 20)
             SceneManager.LoadScene(3);
     }
 }
