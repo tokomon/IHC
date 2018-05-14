@@ -10,14 +10,12 @@ public class EsperandoObs : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (AssemblyCSharp.PlayerInfo.Instance.option == 30)
+        if (AssemblyCSharp.PlayerInfo.Instance.read_map)
             SceneManager.LoadScene(3);
-        AssemblyCSharp.PlayerInfo.Instance.sendPosition();
     }
 }

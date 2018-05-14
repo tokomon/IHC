@@ -29,6 +29,7 @@ namespace AssemblyCSharp
 		//		public const int OPTION_READY						= 14;
 		//		public const int OPTION_START_AGAIN					= 15;
 		public const int OPTION_GAME_FINISHED				= 20;
+		public const int OPTION_MAPS_SPECTATOR				= 30;
 		public const int OPTION_DISCONNECT					= 99;
 
 		public Socket socket;
@@ -62,8 +63,12 @@ namespace AssemblyCSharp
 		public bool alertar_jugador = false;
 		public bool actualizar_map = false;
 		public bool alertar_forzado = false;
+		public bool read_map = false;
 
 		private static PlayerInfo instance = null;
+		
+		private String maps_data;
+		private String jugadas;
 
 		public PlayerInfo (){
 		}
@@ -78,6 +83,7 @@ namespace AssemblyCSharp
 		}
 		public bool startConnection(String ip, int port,int type){
 			try {
+				read_map=false;
 				read_winner=false;
 				socket = new Socket (
 					AddressFamily.InterNetwork,
@@ -102,6 +108,7 @@ namespace AssemblyCSharp
 			return true;
 		}
 		public void endConnection(){
+			read_map=false;
 			sendPositionOption = 0;
 			socket.Disconnect (false);
 			socket = null;
@@ -175,18 +182,12 @@ namespace AssemblyCSharp
 				{
 					alertar_jugador = true;
 					break;
-				}/*
-			case OPTION_SEND_NEW_MAP: // PLAYER
+				}
+			case OPTION_MAPS_SPECTATOR: // SPECTATOR
 				{
-					reloadMap ();
-					sendReady ();
+					read_map = true;
 					break;
 				}
-			case OPTION_START_AGAIN: // PLAYER
-				{
-					startGameAgain();
-					break;
-				}*/
 			case OPTION_DISCONNECT:
 				{
 					alertar_forzado = true;
@@ -211,6 +212,7 @@ namespace AssemblyCSharp
 		void iniMap(){
 			Debug.LogFormat ("Size: {0}", matrix_size.ToString());
 			Debug.LogFormat ("Map: {0}", map_data.ToString());
+			read_map=true;
 			// Cargar Mapa
 			sendPositionOption = 1;
 		}

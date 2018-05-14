@@ -22,12 +22,13 @@ public class Escena : MonoBehaviour {
 
         bool data = AssemblyCSharp.PlayerInfo.Instance.startConnection(IPField.text, puerto, opcion);
 
-        if (data && (opcion == 0))
-            SceneManager.LoadScene(1);
-        else
-            Debug.Log("Imposible conectar al servidor, pruebe otra vez PE");
-        if (data && (opcion == 1))
-            SceneManager.LoadScene(2);
+        if (data)
+		{
+			if (opcion == 0)
+            	SceneManager.LoadScene(1);
+        	else
+            	SceneManager.LoadScene(2);
+		}
         else
             Debug.Log("Imposible conectar al servidor, pruebe otra vez PE");
 	}

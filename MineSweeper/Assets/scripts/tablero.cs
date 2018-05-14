@@ -265,7 +265,7 @@ public class tablero : MonoBehaviour
     	{'row': 4, 'col': 2, 'content': 4}, {'row': 4, 'col': 3, 'content': 2}, 
     	{'row': 4, 'col': 4, 'content': 1}]";*/
 
-        while (AssemblyCSharp.PlayerInfo.Instance.map_data == null) ;
+		while (AssemblyCSharp.PlayerInfo.Instance.read_map == false);
         String data = AssemblyCSharp.PlayerInfo.Instance.map_data;
         Debug.Log(data.ToString());
 
