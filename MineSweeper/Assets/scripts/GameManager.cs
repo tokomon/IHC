@@ -12,23 +12,42 @@ namespace Interprete
         int x = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
         int y = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
         int posX = 0, posY = 0;
-        List<MJson> obj;
+        List<MJson> obj1;
+        List<MJson> obj2;
+        List<MJson> obj3;
+        List<MJson> obj4;
         //lista que lee el JSON
         //hacer 3d
-        double[,] matrix = new double[AssemblyCSharp.PlayerInfo.Instance.matrix_size, AssemblyCSharp.PlayerInfo.Instance.matrix_size];//matriz que se debe de dibujar
+        List<double[,]> matrix = new List<double[,]>();
+        Tablero[] matriz;
         public Cell prefab;
+
 
         public Sprite vanilaSprite;//valor no descubierto
         public Sprite mineSprite;//mina
         public Sprite freeSprite;//espacio presionado
-
+        public Sprite paredSprite;//espacio presionado
+                                  //posiciones actuales
+        int posXC = 0;
+        int posYC = 0;
 
         void Start()
         {
-            /*TableroInstance(posX, posY);
-            TableroInstance(posX - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), posY - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1));
-            TableroInstance(posX, posY - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1));
-            TableroInstance(posX - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), posY);*/
+            for (int i = 0; i < 4; i++)
+            {
+                matrix.Add(new double[AssemblyCSharp.PlayerInfo.Instance.matrix_size, AssemblyCSharp.PlayerInfo.Instance.matrix_size]);//matriz que se debe de dibujar
+            }
+            jsonToMatriz();//llenamos la matriz con la data del json
+           /* for (int i = 0; i < 4; i++)
+            {
+                 matriz[i] = new Tablero();
+            }*/
+
+
+            TableroInstance(0,posX, posY, matrix[0]);
+            TableroInstance(1,posX - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), posY - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), matrix[1]);
+            TableroInstance(2,posX, posY - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), matrix[2]);
+            TableroInstance(3,posX - (AssemblyCSharp.PlayerInfo.Instance.matrix_size + 1), posY,matrix[3]);
             //todos los tableros empiezan en 0.0 de la esquina izq de abajo
             //se tendria que cambiar para que empiecen en cada esquina de los cuadrados
             //es decir (0,0) (n,n) (n,n) (n,n)
@@ -36,19 +55,21 @@ namespace Interprete
 
         // Update is called once per frame
         void Update()
-		{
-			if (AssemblyCSharp.PlayerInfo.Instance.read_winner)
-			{//Cuando se conecta un ganador eliminar conexión y pasar a escenar de victoria o derrota
-				Debug.LogFormat("Winner: {0}", AssemblyCSharp.PlayerInfo.Instance.player_winner);//player_winner si es el ID del ganador
-				SceneManager.LoadScene(7);
-				AssemblyCSharp.PlayerInfo.Instance.endConnection(); //Borra conexión
-				Debug.Log("Disconnected");
-			}
-			if (AssemblyCSharp.PlayerInfo.Instance.hayJugada ()) {
-				Vector3 jugada = AssemblyCSharp.PlayerInfo.Instance.get_jugada ();
-				Debug.Log (jugada.ToString ());
-				// Liberar esa jugada donde jugada.x es X, jugada.y es Y y jugada.z es el ID del jugador.
-			}
+        {
+            if (AssemblyCSharp.PlayerInfo.Instance.read_winner)
+            {//Cuando se conecta un ganador eliminar conexión y pasar a escenar de victoria o derrota
+                Debug.LogFormat("Winner: {0}", AssemblyCSharp.PlayerInfo.Instance.player_winner);//player_winner si es el ID del ganador
+                SceneManager.LoadScene(7);
+                AssemblyCSharp.PlayerInfo.Instance.endConnection(); //Borra conexión
+                Debug.Log("Disconnected");
+            }
+            if (AssemblyCSharp.PlayerInfo.Instance.hayJugada()) {
+                Vector3 jugada = AssemblyCSharp.PlayerInfo.Instance.get_jugada();
+                Debug.Log(jugada.ToString());
+                matriz[(int)(jugada.z)-1].Activate((int)jugada.x, (int)jugada.y);
+
+                // Liberar esa jugada donde jugada.x es X, jugada.y es Y y jugada.z es el ID del jugador.
+            }
         }
         //Lista que se obtiene de leer el json
         public class MJson
@@ -66,45 +87,48 @@ namespace Interprete
 
             public Sprite free;
             public Sprite bomb;
+            public Sprite wall;
             public Sprite full;
 
             //para poder usar los sprites definidos arriba
             public void changeSpriteFree(Sprite free_)
-            {
-                free = free_;
-            }
+            { free = free_; }
             public void changeSpriteBomb(Sprite bomb_)
-            {
-                bomb = bomb_;
-            }
+            { bomb = bomb_; }
             public void changeSpriteFull(Sprite full_)
-            {
-                full = full_;
-            }
+            { full = full_; }
+            public void changeSpriteWall(Sprite wall_)
+            { wall = wall_; }
             /****************************************/
-            public Tablero(int x, int y, Sprite mine, Sprite full, Sprite free)
+            public Tablero(int x, int y, Sprite mine, Sprite full, Sprite free, Sprite wall)
             {
                 posX = x;
                 posY = y;
                 changeSpriteFree(free);
                 changeSpriteBomb(mine);
                 changeSpriteFull(full);
+                changeSpriteWall(wall);
             }
 
             public void init()
             { //dibuja la matriz desde el inicio
-                CellMatrixLoop((i, j) =>
+                for (int i = 0; i < cellMatrix.GetLength(0); i++)
                 {
-                    cellMatrix[i, j].Init(new Vector2Int(i, j),
-                    (matrix[i, j] != (-1) ? false : true),
-                    Activate);
-                    cellMatrix[i, j].sprite = full;
-                });
+                    for (int j = 0; j < cellMatrix.GetLength(1); j++)
+                    {
+                        cellMatrix[i, j].Init(new Vector2Int(i, j),
+                        (matrix[i, j] != (-1) ? false : true),
+                        Activate);
+                        cellMatrix[i, j].sprite = full;
+
+                    }
+                }
             }
 
-            //funcion para onclick
-            void Activate(int i, int j)
+            //funcion para onclick 
+            public void Activate(int i, int j)
             {
+
                 if (cellMatrix[i, j].showed)
                     return;
                 cellMatrix[i, j].showed = true;
@@ -112,29 +136,17 @@ namespace Interprete
                 if (cellMatrix[i, j].mine)
                 {
                     //acaba el juego
-                    cellMatrix[i, j].sprite = bomb;
-                    Debug.Log("Mina");
+                    cellMatrix[i, j].sprite = wall;
+                    Debug.Log("Pared");
                     //StartCoroutine(your_timer()); //Delay
-                    init();
+                    //    init();
                     //volver a jugar
                 }
                 else
                 {
                     cellMatrix[i, j].sprite = free;
-                    //si hay un campo libre de debe de hacer recursion para mostrar
-                    /*
-                    if (ArroundCount(i, j) == 0)
-                    {
-                        ActivateArround(i,j);
-                    }
-                    else
-                    {
-                        cellMatrix[i, j].text = ArroundCount(i, j).ToString();
-                    }*/
-                    cellMatrix[i, j].text = (matrix[i, j]).ToString();
-
                 }
-            }
+                }
             void ActivateArround(int i, int j)
             {
                 if (PointIsInsideMatrix(i + 1, j))
@@ -204,44 +216,38 @@ namespace Interprete
         }
 
         void jsonToMatriz()
-        {/*
-            string json = @"[{'row': 0, 'col': 0, 'content': 1}, {'row': 0, 'col': 1, 'content': 1}, 
-    	{'row': 0, 'col': 2, 'content': 3}, {'row': 0, 'col': 3, 'content': -1}, 
-    	{'row': 0, 'col': 4, 'content': 2}, {'row': 1, 'col': 0, 'content': 2}, 
-    	{'row': 1, 'col': 1, 'content': -1}, {'row': 1, 'col': 2, 'content': 4}, 
-    	{'row': 1, 'col': 3, 'content': -1}, {'row': 1, 'col': 4, 'content': 2}, 
-    	{'row': 2, 'col': 0, 'content': 3}, {'row': 2, 'col': 1, 'content': -1}, 
-    	{'row': 2, 'col': 2, 'content': 6}, {'row': 2, 'col': 3, 'content': 3}, 
-    	{'row': 2, 'col': 4, 'content': 2}, {'row': 3, 'col': 0, 'content': 3}, 
-    	{'row': 3, 'col': 1, 'content': -1}, {'row': 3, 'col': 2, 'content': -1}, 
-    	{'row': 3, 'col': 3, 'content': -1}, {'row': 3, 'col': 4, 'content': 1}, 
-    	{'row': 4, 'col': 0, 'content': 2}, {'row': 4, 'col': 1, 'content': -1}, 
-    	{'row': 4, 'col': 2, 'content': 4}, {'row': 4, 'col': 3, 'content': 2}, 
-    	{'row': 4, 'col': 4, 'content': 1}]";*/
+        {
 
-            while (AssemblyCSharp.PlayerInfo.Instance.map_data == null);
-            String data = AssemblyCSharp.PlayerInfo.Instance.map_data;
+            while (AssemblyCSharp.PlayerInfo.Instance.map_data == null) ;
+            String[] data = AssemblyCSharp.PlayerInfo.Instance.maps_data.Split('&');
             Debug.Log(data.ToString());
-            
-            obj = JsonConvert.DeserializeObject<List<MJson>>(data);
 
-            for (int i = 0; i < AssemblyCSharp.PlayerInfo.Instance.matrix_size  * AssemblyCSharp.PlayerInfo.Instance.matrix_size; i++)
+            obj1 = JsonConvert.DeserializeObject<List<MJson>>(data[0]);
+            obj2 = JsonConvert.DeserializeObject<List<MJson>>(data[1]);
+            obj3 = JsonConvert.DeserializeObject<List<MJson>>(data[2]);
+            obj4 = JsonConvert.DeserializeObject<List<MJson>>(data[3]);
+
+
+            for (int i = 0; i < AssemblyCSharp.PlayerInfo.Instance.matrix_size * AssemblyCSharp.PlayerInfo.Instance.matrix_size; i++)
             {
-                matrix[obj[i].row, obj[i].col] = obj[i].content;
+                matrix[0][obj1[i].row, obj1[i].col] = obj1[i].content;
+                matrix[1][obj2[i].row, obj2[i].col] = obj2[i].content;
+                matrix[2][obj3[i].row, obj3[i].col] = obj3[i].content;
+                matrix[3][obj4[i].row, obj4[i].col] = obj4[i].content;
             }
         }
 
 
-        void TableroInstance(int posx, int posy)
+        void TableroInstance(int p, int posx, int posy, double[,] m)
         {
-            Tablero matriz = new Tablero(posx, posy, mineSprite, vanilaSprite, freeSprite);
-            jsonToMatriz();//llenamos la matriz con la data del json
-            matriz.matrix = matrix;
+             matriz[p] = new Tablero(posx, posy, mineSprite, vanilaSprite, freeSprite, paredSprite);
 
-            if (matriz.cellMatrix == null)
+            matriz[p].matrix = m;
+
+            if (matriz[p].cellMatrix == null)
             {
-                matriz.cellMatrix = new Cell[x, y];//crea un objeto matriz con 2 dimensiones
-                matriz.CellMatrixLoop((i, j) =>
+                matriz[p].cellMatrix = new Cell[x, y];//crea un objeto matriz con 2 dimensiones
+                matriz[p].CellMatrixLoop((i, j) =>
                 {
                     Cell go = Instantiate(prefab,
                         new Vector3(i + posx, j + posy),
@@ -250,18 +256,12 @@ namespace Interprete
                 //hace una copia de un objeto y ponerlo en otro lugar 
                 go.name = string.Format("(X:{0},Y:{1})", i, j);
 
-                    matriz.cellMatrix[i, j] = go;
+                    matriz[p].cellMatrix[i, j] = go;
                 });
             }
-            matriz.init();
+            matriz[p].init();
 
         }
-
-        System.Collections.IEnumerator your_timer()
-        {
-            Debug.Log("Your enter Coroutine at" + Time.time);
-            yield return new WaitForSeconds(10000000000000000.0f);
-            //funcion de delay para que se muestre la mina al acabar el juego
-        }
+        
     }
 }
