@@ -45,13 +45,8 @@ namespace Interprete
 				AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace (2, 2);//Pruebas Ignorar
 			else if ( AssemblyCSharp.PlayerInfo.Instance.read_winner) {//Cuando se conecta un ganador eliminar conexión y pasar a escenar de victoria o derrota
 				Debug.LogFormat ("Winner: {0}", AssemblyCSharp.PlayerInfo.Instance.player_winner);//player_winner si es el ID del ganador
-                if(AssemblyCSharp.PlayerInfo.Instance.player_id == AssemblyCSharp.PlayerInfo.Instance.player_winner){
-                    SceneManager.LoadScene(5);
-                }
-                else{
-                    SceneManager.LoadScene(6);
-                }
-				AssemblyCSharp.PlayerInfo.Instance.endConnection (); //Borra conexión
+                SceneManager.LoadScene(7);
+                AssemblyCSharp.PlayerInfo.Instance.endConnection (); //Borra conexión
 				Debug.Log ("Disconnected");
 			} else if (AssemblyCSharp.PlayerInfo.Instance.alertar_forzado) { // Cuando se te desconecta por X motivos
 				Debug.Log (AssemblyCSharp.PlayerInfo.Instance.message.ToString ()); //Mensaje a mostrar
