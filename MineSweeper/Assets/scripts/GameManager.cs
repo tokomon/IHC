@@ -44,6 +44,10 @@ namespace Interprete
 				AssemblyCSharp.PlayerInfo.Instance.endConnection(); //Borra conexión
 				Debug.Log("Disconnected");
 			}
+			Vector3 jugada = AssemblyCSharp.PlayerInfo.Instance.get_jugada ();
+			if (jugada != null) {
+				// Liberar esa jugada donde jugada.x es X, jugada.y es Y y jugada.z es el ID del jugador.
+			}
         }
         //Lista que se obtiene de leer el json
         public class MJson

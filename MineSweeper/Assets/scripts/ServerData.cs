@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Linq;
+using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -30,6 +31,7 @@ namespace AssemblyCSharp
 		//		public const int OPTION_START_AGAIN					= 15;
 		public const int OPTION_GAME_FINISHED				= 20;
 		public const int OPTION_MAPS_SPECTATOR				= 30;
+		public const int OPTION_SPECTATOR_JUGADAS			= 31;
 		public const int OPTION_DISCONNECT					= 99;
 
 		public Socket socket;
@@ -66,11 +68,15 @@ namespace AssemblyCSharp
 		public bool read_map = false;
 
 		private static PlayerInfo instance = null;
-		
-		private String maps_data;
-		private String jugadas;
 
+		private bool flagClient = false;
+		private bool flagQueue = false;
+
+		public String maps_data;
+		private String jugadas;
+		public Queue<Vector3> listaJugadas;
 		public PlayerInfo (){
+			listaJugadas = new Queue<Vector3> ();
 		}
 		public static PlayerInfo Instance
 		{
@@ -83,6 +89,8 @@ namespace AssemblyCSharp
 		}
 		public bool startConnection(String ip, int port,int type){
 			try {
+				flagClient = false;
+				flagQueue = false;
 				read_map=false;
 				read_winner=false;
 				socket = new Socket (
@@ -107,7 +115,57 @@ namespace AssemblyCSharp
 			}
 			return true;
 		}
+		private void canClientReadQueue(){
+			flagClient = true;
+			int turno = 0;
+			while(flagQueue && turno == 0)
+				;
+		}
+		private void freeClientReadQueue(){
+			flagClient = false;
+		}
+		private void canQueueReadQueue(){
+			flagQueue = true;
+			int turno = 1;
+			while(flagClient && turno == 1)
+				;
+		}
+		private void freeQueueReadQueue(){
+			flagQueue = false;
+		}
+		private void readJugadas (){
+			if(jugadas.Length > 0){
+				canQueueReadQueue();
+				try{
+					String[] datos = jugadas.Split ("&");
+					for (int i = 0; i < datos.Length; i += 3) {
+						if(i + 2 < datos.Length){
+							int player_id = 0;
+							int x;
+							int y;
+							bool value = Int32.TryParse (datos [i], player_id) && Int32.TryParse (datos [i+1], x) && Int32.TryParse (datos [i+2], y);
+							if(value)
+								listaJugadas.Enqueue (new Vector3 (x, y, player_id));
+						}
+					}
+				}
+				catch(Exception ex){
+					Debug.Log (ex.Message);
+				};
+				freeQueueReadQueue();
+			}
+		}
+		public Vector3 get_jugada(){
+			Vector3 returnValue = null;
+			canClientReadQueue ();
+			if (listaJugadas.Count > 0)
+				returnValue = listaJugadas.Dequeue ();
+			freeClientReadQueue ();
+			return returnValue;
+		}
 		public void endConnection(){
+			flagClient = false;
+			flagQueue = false;
 			read_map=false;
 			sendPositionOption = 0;
 			socket.Disconnect (false);
@@ -186,7 +244,13 @@ namespace AssemblyCSharp
 			case OPTION_MAPS_SPECTATOR: // SPECTATOR
 				{
 					read_map = true;
+					readJugadas ();
 					break;
+				}
+			case OPTION_SPECTATOR_JUGADAS: // SPECTATOR
+				{
+					readJugadas ();
+					break
 				}
 			case OPTION_DISCONNECT:
 				{
