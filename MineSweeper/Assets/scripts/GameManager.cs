@@ -44,8 +44,8 @@ namespace Interprete
 				AssemblyCSharp.PlayerInfo.Instance.endConnection(); //Borra conexión
 				Debug.Log("Disconnected");
 			}
-			Vector3 jugada = AssemblyCSharp.PlayerInfo.Instance.get_jugada ();
-			if (jugada != null) {
+			if (AssemblyCSharp.PlayerInfo.Instance.hayJugada ()) {
+				Vector3 jugada = AssemblyCSharp.PlayerInfo.Instance.get_jugada ();
 				// Liberar esa jugada donde jugada.x es X, jugada.y es Y y jugada.z es el ID del jugador.
 			}
         }

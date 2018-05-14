@@ -137,13 +137,15 @@ namespace AssemblyCSharp
 			if(jugadas.Length > 0){
 				canQueueReadQueue();
 				try{
-					String[] datos = jugadas.Split ("&");
+					string[] datos = jugadas.Split ('&');
 					for (int i = 0; i < datos.Length; i += 3) {
 						if(i + 2 < datos.Length){
 							int player_id = 0;
 							int x;
 							int y;
-							bool value = Int32.TryParse (datos [i], player_id) && Int32.TryParse (datos [i+1], x) && Int32.TryParse (datos [i+2], y);
+							bool value = Int32.TryParse (datos [i], out player_id);
+							value &= Int32.TryParse (datos [i+1], out x);
+							value &= Int32.TryParse (datos [i+2], out y);
 							if(value)
 								listaJugadas.Enqueue (new Vector3 (x, y, player_id));
 						}
@@ -155,11 +157,13 @@ namespace AssemblyCSharp
 				freeQueueReadQueue();
 			}
 		}
+		public bool hayJugada()
+		{
+			return listaJugadas.Count > 0;
+		}
 		public Vector3 get_jugada(){
-			Vector3 returnValue = null;
 			canClientReadQueue ();
-			if (listaJugadas.Count > 0)
-				returnValue = listaJugadas.Dequeue ();
+			Vector3 returnValue = listaJugadas.Dequeue ();
 			freeClientReadQueue ();
 			return returnValue;
 		}
@@ -250,7 +254,7 @@ namespace AssemblyCSharp
 			case OPTION_SPECTATOR_JUGADAS: // SPECTATOR
 				{
 					readJugadas ();
-					break
+					break;
 				}
 			case OPTION_DISCONNECT:
 				{
