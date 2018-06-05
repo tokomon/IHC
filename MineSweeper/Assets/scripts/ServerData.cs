@@ -36,7 +36,7 @@ namespace AssemblyCSharp
 
 		public Socket socket;
 		public int sendPositionOption = 0;
-		private byte[] _recieveBuffer = new byte[8192];
+		private byte[] _recieveBuffer = new byte[262144];
 		DateTime time = DateTime.Now;
 
 		public int option;
@@ -372,9 +372,10 @@ namespace AssemblyCSharp
 			byte[] recData = new byte[recieved];
 			Buffer.BlockCopy(_recieveBuffer,0,recData,0,recieved);
 			// Saving data in playerInfo
-			receiveString(recData);
-			//workData
-			workData();
+			if (receiveString (recData,recieved)) {
+				//workData
+				workData ();
+			}
 			if (option != OPTION_GAME_FINISHED && option != OPTION_DISCONNECT) {
 				socket.BeginReceive (
 					_recieveBuffer,
@@ -386,16 +387,31 @@ namespace AssemblyCSharp
 				);
 			}
 		}
-		void receiveString(byte[] recData){
-			Debug.Log ("Me llego algo wey");
-			String str_size = System.Text.Encoding.ASCII.GetString (recData,0,4);
-			int json_size;
-			Int32.TryParse (str_size, out json_size);
-			Debug.LogFormat ("Json Size: {0}", json_size);
-			String json_str = System.Text.Encoding.ASCII.GetString (recData,4,json_size);
-			Debug.LogFormat ("Data: {0}", json_str.ToString());
-			JsonUtility.FromJsonOverwrite(json_str.ToString(), this);
-			Debug.LogFormat ("Recived Option: {0}", option);
+		bool receiveString(byte[] recData, int recieved){
+			try{
+				if(recieved < 6){
+					Debug.Log ("Mal tamaño de BYTES");
+					return false;
+				}
+				Debug.Log ("Me llego algo wey");
+				String str_size = System.Text.Encoding.ASCII.GetString (recData,0,6);
+				int json_size;
+				Int32.TryParse (str_size, out json_size);
+				Debug.LogFormat ("Json Size: {0}", json_size);
+				Debug.LogFormat ("Package Size: {0}", recieved);
+				if(json_size + 6 != recieved){
+					Debug.Log ("Faltan BYTES");
+					return false;
+				}
+				String json_str = System.Text.Encoding.ASCII.GetString (recData,6,json_size);
+				Debug.LogFormat ("Data: {0}", json_str.ToString());
+				JsonUtility.FromJsonOverwrite(json_str.ToString(), this);
+				Debug.LogFormat ("Recived Option: {0}", option);
+			} catch (Exception ex) {
+				Debug.Log (ex.Message);
+				return false;
+			}
+			return true;
 		}
 	}
 }

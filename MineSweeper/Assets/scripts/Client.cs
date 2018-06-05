@@ -14,7 +14,7 @@ public class Client : MonoBehaviour {
 	void Update ()
     {
         if (Input.GetKeyDown(KeyCode.S) && !connected)
-            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.137.151", 8889, 1);
+            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.43.58", 8888, 0);
         else if (Input.GetKeyDown(KeyCode.Q) && !connected)
             connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.137.151", 8888, 1);
         /*else if (Input.GetKeyDown(KeyCode.Q) && !connected)
