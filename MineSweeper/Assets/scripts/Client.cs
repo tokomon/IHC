@@ -2,21 +2,35 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.UI;
+using System;
 
 using AssemblyCSharp;
 
 public class Client : MonoBehaviour {
 	bool connected = false;
+	InputField IPField = null;
+	InputField PuertoField = null;
+	Toggle optoggle = null;
 	// Use this for initialization
 	void Start () {
+		IPField = (InputField)GameObject.Find("IP").GetComponent<InputField>();
+		IPField.text = "127.0.0.1";
+		PuertoField = (InputField)GameObject.Find ("Puerto").GetComponent<InputField> ();
+		PuertoField.text = "8000";
+		optoggle = (Toggle)GameObject.Find ("Opcion").GetComponent<Toggle> ();
 	}
 	// Update is called once per frame
 	void Update ()
     {
-        if (Input.GetKeyDown(KeyCode.S) && !connected)
-            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.43.58", 8888, 0);
-        else if (Input.GetKeyDown(KeyCode.Q) && !connected)
-            connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.137.151", 8888, 1);
+		if (Input.GetKeyDown(KeyCode.S) && !connected){
+			int puerto;
+			Int32.TryParse (PuertoField.text, out puerto);
+			int opcion = 0;
+			if (optoggle.isOn)
+				opcion = 1;
+			connected = AssemblyCSharp.PlayerInfo.Instance.startConnection(IPField.text, puerto, opcion);
+		}
         /*else if (Input.GetKeyDown(KeyCode.Q) && !connected)
             connected = AssemblyCSharp.PlayerInfo.Instance.startConnection("192.168.43.177", 8000, 1);*/
         //connected = AssemblyCSharp.PlayerInfo.Instance.startConnection ("192.168.43.177", 8803, 1);

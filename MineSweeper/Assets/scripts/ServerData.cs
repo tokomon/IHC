@@ -36,7 +36,9 @@ namespace AssemblyCSharp
 
 		public Socket socket;
 		public int sendPositionOption = 0;
-		private byte[] _recieveBuffer = new byte[262144];
+		private byte[] _recieveBuffer = new byte[256];
+		private String actualBuffer="";
+		private int json_size_data=-1;
 		DateTime time = DateTime.Now;
 
 		public int option;
@@ -388,30 +390,31 @@ namespace AssemblyCSharp
 			}
 		}
 		bool receiveString(byte[] recData, int recieved){
-			try{
-				if(recieved < 6){
-					Debug.Log ("Mal tamaño de BYTES");
-					return false;
-				}
-				Debug.Log ("Me llego algo wey");
-				String str_size = System.Text.Encoding.ASCII.GetString (recData,0,6);
-				int json_size;
-				Int32.TryParse (str_size, out json_size);
-				Debug.LogFormat ("Json Size: {0}", json_size);
-				Debug.LogFormat ("Package Size: {0}", recieved);
-				if(json_size + 6 != recieved){
-					Debug.Log ("Faltan BYTES");
-					return false;
-				}
-				String json_str = System.Text.Encoding.ASCII.GetString (recData,6,json_size);
-				Debug.LogFormat ("Data: {0}", json_str.ToString());
-				JsonUtility.FromJsonOverwrite(json_str.ToString(), this);
-				Debug.LogFormat ("Recived Option: {0}", option);
-			} catch (Exception ex) {
-				Debug.Log (ex.Message);
-				return false;
+			bool return_value = false;
+			Debug.LogFormat ("Package Size: {0}", recieved);
+			actualBuffer += System.Text.Encoding.ASCII.GetString (recData, 0, recieved);
+			if (json_size_data < 0 && actualBuffer.Length >= 6) {
+				Debug.Log ("Inicio de un Paquete");
+				String str_size = actualBuffer.Substring (0, 6);
+				Int32.TryParse (str_size, out json_size_data);
+				actualBuffer = actualBuffer.Substring (6, actualBuffer.Length - 6);
+				Debug.LogFormat ("Json Size: {0}", json_size_data);
 			}
-			return true;
+			if (actualBuffer.Length >= json_size_data) {
+				String json_str = actualBuffer.Substring(0,json_size_data);
+				actualBuffer = actualBuffer.Substring (json_size_data, actualBuffer.Length - json_size_data);
+				Debug.LogFormat ("Data: {0}", json_str.ToString());
+				try{
+					JsonUtility.FromJsonOverwrite(json_str.ToString(), this);
+					Debug.LogFormat ("Recived Option: {0}", option);
+					return_value = true;
+				} catch (Exception ex) {
+					Debug.Log (ex.Message);
+				}
+				json_size_data = -1;
+				Debug.Log ("Fin de un Paquete");
+			}
+			return return_value;
 		}
 	}
 }
