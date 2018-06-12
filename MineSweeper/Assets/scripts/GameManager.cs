@@ -10,11 +10,11 @@ namespace Interprete
 
     public class GameManager : MonoBehaviour
 {
-    const int fijo = 5;//tamaño de los tableros
-    int x = fijo;
-    int y = fijo;
-   // int x = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
-   // int y = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
+   // const int fijo = 5;//tamaño de los tableros
+   // int x = fijo;
+   // int y = fijo;
+    int x = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
+    int y = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
     int posX = 0, posY = 0;
     List<List<MJson>> obj;
     //lista que lee el JSON
@@ -22,7 +22,8 @@ namespace Interprete
     List<double[,]> matrix = new List<double[,]>();
     int[,] matrixPos;
 
-    double[,] matrixTest = new double[fijo,fijo];
+        double[,] matrixTest; 
+     public   String[] data;
 
 
     Tablero[] matriz;
@@ -40,8 +41,15 @@ namespace Interprete
 
     void Start()
     {
-       
-        int size = fijo;// AssemblyCSharp.PlayerInfo.Instance.matrix_size;
+            obj = new List<List<MJson>>();
+            while (AssemblyCSharp.PlayerInfo.Instance.read_map == false) ;
+            data = AssemblyCSharp.PlayerInfo.Instance.maps_data.Split('&');
+
+            int size = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
+
+            matrixTest = new double[size, size];
+
+
         double[,] matrixM = inicializeMat(size, size, 0, 0);
 
         matrixPos = new int[4,2]; 
@@ -57,34 +65,62 @@ namespace Interprete
         matrixPos[3, 0] = posX;
         matrixPos[3, 1] = posY - (size + 1);
 
-        int user = 4;
+
+        Debug.Log(data.ToString());
+            int user = data.Length;
+            for (int i = 0; i < user; i++)
+            {
+                matrix.Add(new double[size,size]);
+
+            }
 
 
-        matriz = new Tablero[user];
-  /*      matrixTest = new double[,] { { 1, 1, 3, 0, 2 }, { 2, 0, 4, 0, 2 },
-                              { 3, 0, 6, 3, 2 }, { 3, 0, 0, 0, 1 },
-                              { 2, 0, 4, 2, 1 } };
-  */
-        matrix.Add(matrixM);
+
+            matriz = new Tablero[data.Length];
+            /*      matrixTest = new double[,] { { 1, 1, 3, 0, 2 }, { 2, 0, 4, 0, 2 },
+                                        { 3, 0, 6, 3, 2 }, { 3, 0, 0, 0, 1 },
+                                        { 2, 0, 4, 2, 1 } };
+            */
+            /*
+                  matrix.Add(matrixM);
 
 
-        for (int i = 2; i < user+1/*numero de usuarios*/; i++)
-        {
-            //  matrix.Add(new double[size,size]);//matriz que se debe de dibujar
-            matrix.Add(Mirror(matrixM, size, i));
-        }
-        //   jsonToMatriz();
+                  for (int i = 2; i < data.Length +1; i++)
+                  {
+                      //  matrix.Add(new double[size,size]);//matriz que se debe de dibujar
+                      matrix.Add(Mirror(matrixM, size, i));
+                  }*/
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                Debug.Log(data[i].ToString());
+                obj.Add(JsonConvert.DeserializeObject<List<MJson>>(data[i]));
+            }
+            Debug.Log(AssemblyCSharp.PlayerInfo.Instance.matrix_size);
+            for (int i = 0; i < AssemblyCSharp.PlayerInfo.Instance.matrix_size * AssemblyCSharp.PlayerInfo.Instance.matrix_size; i++)
+            {
+                for (int j = 0; j < data.Length; j++)
+                {
+                    matrix[j][obj[j][i].row, obj[j][i].col] = obj[j][i].content;
+
+                }
+            }
+            //aqui debo cargar la matriz
 
         for (int i = 0; i<user;i++)
         {
             TableroInstance(i, matrixPos[i,0], matrixPos[i,1], matrix[i]);
+                Debug.Log(i);
+                Debug.Log(matrix[i][0,0]);
+
+
+            }
+
+            //todos los tableros empiezan en 0.0 de la esquina izq de abajo
+            //se tendria que cambiar para que empiecen en cada esquina de los cuadrados
+            //es decir (0,0) (n,n) (n,n) (n,n)
         }
-        
-        //todos los tableros empiezan en 0.0 de la esquina izq de abajo
-        //se tendria que cambiar para que empiecen en cada esquina de los cuadrados
-        //es decir (0,0) (n,n) (n,n) (n,n)
-    }
-    /*
+    
     // Update is called once per frame
     void Update()
     {
@@ -99,12 +135,14 @@ namespace Interprete
         {
             Vector3 jugada = AssemblyCSharp.PlayerInfo.Instance.get_jugada();
             Debug.Log(jugada.ToString());
+        //    matriz[(int)(jugada.z) - 1].Activate((int)jugada.x, (int)jugada.y);
             matriz[(int)(jugada.z) - 1].Activate((int)jugada.x, (int)jugada.y);
 
-            // Liberar esa jugada donde jugada.x es X, jugada.y es Y y jugada.z es el ID del jugador.
+
+                // Liberar esa jugada donde jugada.x es X, jugada.y es Y y jugada.z es el ID del jugador.
+            }
         }
-    }
-    */
+    
     //Lista que se obtiene de leer el json
     public class MJson
     {
@@ -154,7 +192,7 @@ namespace Interprete
         }
 
         //funcion para onclick
-        void Activate(int i, int j)
+        public void Activate(int i, int j)
         {
             if (cellMatrix[i, j].showed)
                 return;
@@ -220,32 +258,7 @@ namespace Interprete
         }
     }
 
-    void jsonToMatriz()
-    {
 
-    
-        /*
-        while (AssemblyCSharp.PlayerInfo.Instance.map_data == null) ;
-        String[] data = AssemblyCSharp.PlayerInfo.Instance.maps_data.Split('&');
-        Debug.Log(data.ToString());
-        */
-
-
-        for (int i = 0; i < 4; i++)
-        {
-          //  obj[i] = JsonConvert.DeserializeObject<List<MJson>>(data[i]);
-        }
-
-        for (int i = 0; i < fijo * fijo/* AssemblyCSharp.PlayerInfo.Instance.matrix_size * AssemblyCSharp.PlayerInfo.Instance.matrix_size*/; i++)
-        {
-            for (int j = 0; j < 4; j++)
-            {
-                matrix[j][obj[j][i].row, obj[j][i].col] = obj[j][i].content;
-
-            }
-        }
-        
-    }
 
     void TableroInstance(int p, int posx, int posy, double[,] m)
     {
@@ -253,10 +266,13 @@ namespace Interprete
         {
             matrix = m
         };
+            Debug.Log("hasilf");
 
 
-        if (matriz[p].cellMatrix == null)
+
+            if (matriz[p].cellMatrix == null)
         {
+                Debug.Log("hola");
             matriz[p].cellMatrix = new Cell[x, y];//crea un objeto matriz con 2 dimensiones
             matriz[p].CellMatrixLoop((i, j) =>
             {
