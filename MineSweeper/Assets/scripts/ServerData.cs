@@ -73,9 +73,10 @@ namespace AssemblyCSharp
 
 		private bool flagClient = false;
 		private bool flagQueue = false;
+		private int turno = 0;
 
 		public String maps_data;
-		private String jugadas;
+		public String jugadas;
 		public Queue<Vector3> listaJugadas;
 		public PlayerInfo (){
 			listaJugadas = new Queue<Vector3> ();
@@ -93,6 +94,7 @@ namespace AssemblyCSharp
 			try {
 				flagClient = false;
 				flagQueue = false;
+				turno = 0;
 				read_map=false;
 				read_winner=false;
 				socket = new Socket (
@@ -119,7 +121,7 @@ namespace AssemblyCSharp
 		}
 		private void canClientReadQueue(){
 			flagClient = true;
-			int turno = 0;
+			turno = 0;
 			while(flagQueue && turno == 0)
 				;
 		}
@@ -128,7 +130,7 @@ namespace AssemblyCSharp
 		}
 		private void canQueueReadQueue(){
 			flagQueue = true;
-			int turno = 1;
+			turno = 1;
 			while(flagClient && turno == 1)
 				;
 		}
@@ -143,7 +145,7 @@ namespace AssemblyCSharp
 		private void readJugadas (){
 			canQueueReadQueue();
 			try{
-				string[] datos = jugadas.Split ('&');
+				string[] datos = jugadas.Split('&');
 				for (int i = 0; i < datos.Length; i += 3) {
 					if(i + 2 < datos.Length){
 						int player_id = 0;
@@ -257,10 +259,18 @@ namespace AssemblyCSharp
 				}
 			case OPTION_MAPS_SPECTATOR: // SPECTATOR
 				{
-					read_map = true;
 					Debug.LogFormat ("Size: {0}", matrix_size.ToString());
 					Debug.LogFormat ("Map: {0}", maps_data.ToString());
+					Debug.LogFormat ("Jugadas: {0}", jugadas.ToString());
+					int total_players = maps_data.Split('&').Length;
+					for (int i = 0; i < total_players; ++i) {
+						liberar_x = 0;
+						liberar_y = 0;
+						player_id = i + 1;
+						addJugada ();
+					}
 					readJugadas ();
+					read_map = true;
 					break;
 				}
 			case OPTION_SPECTATOR_JUGADAS: // SPECTATOR
