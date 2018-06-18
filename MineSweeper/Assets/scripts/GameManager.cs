@@ -18,7 +18,6 @@ namespace Interprete
     int posX = 0, posY = 0;
     List<List<MJson>> obj;
     //lista que lee el JSON
-    //hacer 3d
     List<double[,]> matrix = new List<double[,]>();
     int[,] matrixPos;
 
@@ -76,7 +75,7 @@ namespace Interprete
 
 
 
-            matriz = new Tablero[data.Length];
+            matriz = new Tablero[user];
             /*      matrixTest = new double[,] { { 1, 1, 3, 0, 2 }, { 2, 0, 4, 0, 2 },
                                         { 3, 0, 6, 3, 2 }, { 3, 0, 0, 0, 1 },
                                         { 2, 0, 4, 2, 1 } };
@@ -85,36 +84,45 @@ namespace Interprete
                   matrix.Add(matrixM);
 
 
-                  for (int i = 2; i < data.Length +1; i++)
+                  for (int i = 2; i < user +1; i++)
                   {
                       //  matrix.Add(new double[size,size]);//matriz que se debe de dibujar
                       matrix.Add(Mirror(matrixM, size, i));
                   }*/
 
-            for (int i = 0; i < data.Length; i++)
+            for (int i = 0; i < user; i++)
             {
                 Debug.Log(data[i].ToString());
                 obj.Add(JsonConvert.DeserializeObject<List<MJson>>(data[i]));
             }
-            Debug.Log(AssemblyCSharp.PlayerInfo.Instance.matrix_size);
-            for (int i = 0; i < AssemblyCSharp.PlayerInfo.Instance.matrix_size * AssemblyCSharp.PlayerInfo.Instance.matrix_size; i++)
+
+
+
+            Debug.Log(size);
+            for (int i = 0; i < size * size; i++)
             {
-                for (int j = 0; j < data.Length; j++)
+                int j = 0;
+           /*     for (int j = 0; j < user; j++)
                 {
-                    matrix[j][obj[j][i].row, obj[j][i].col] = obj[j][i].content;
+             */       matrix[j][obj[j][i].row, obj[j][i].col] = obj[j][i].content;
 
-                }
+//                }
             }
-            //aqui debo cargar la matriz
-
-        for (int i = 0; i<user;i++)
+            //aqui debo cargar las matrices
+            //La primera matriz es la correcta, las demas se debe de cambiar:
+            //Probar en clase    
+            /*   for (int i = 2; i < user + 1; i++)
+            {
+                //  matrix.Add(new double[size,size]);//matriz que se debe de dibujar
+                matrix.Add(Mirror(matrix[0], size, i));
+            }
+            */
+            for (int i = 0; i<user;i++)
         {
             TableroInstance(i, matrixPos[i,0], matrixPos[i,1], matrix[i]);
                 Debug.Log(i);
                 Debug.Log(matrix[i][0,0]);
-
-
-            }
+        }
 
             //todos los tableros empiezan en 0.0 de la esquina izq de abajo
             //se tendria que cambiar para que empiecen en cada esquina de los cuadrados
@@ -266,13 +274,8 @@ namespace Interprete
         {
             matrix = m
         };
-            Debug.Log("hasilf");
-
-
-
             if (matriz[p].cellMatrix == null)
         {
-                Debug.Log("hola");
             matriz[p].cellMatrix = new Cell[x, y];//crea un objeto matriz con 2 dimensiones
             matriz[p].CellMatrixLoop((i, j) =>
             {
