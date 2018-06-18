@@ -17,6 +17,8 @@ public class Hide : MonoBehaviour {
         /*
         if (gameObject.name[gameObject.name.Length-1] != '1'){
             Destroy(gameObject);
+                    SoundManagerScript.PlaySound("cube");
+
            // this.GetComponent<Renderer>().material = tablero.matPiso;
             //  gameObject.GetComponent<Renderer>().enabled = false;
         }
