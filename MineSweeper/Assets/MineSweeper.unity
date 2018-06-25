@@ -436,7 +436,7 @@ MonoBehaviour:
   IgnoreStartedOverGui: 1
   IgnoreIsOverGui: 1
   RequiredFingerCount: 2
-  RequiredSelectable: {fileID: 0}
+  RequiredSelectable: {fileID: 893012053}
   Camera: {fileID: 1756569286}
   WheelSensitivity: 0
   Relative: 0
