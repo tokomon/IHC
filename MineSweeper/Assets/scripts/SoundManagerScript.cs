@@ -5,17 +5,22 @@ using UnityEngine;
 public class SoundManagerScript : MonoBehaviour {
 
     public static AudioClip cubeDestroySound;
+    public static AudioClip cubeDestroySoundError;
     static AudioSource audioSrc;
 	// Use this for initialization
 	void Start () {
         cubeDestroySound = Resources.Load<AudioClip>("cube");
-    //    Debug.Log(cubeDestroySound);
+        //    Debug.Log(cubeDestroySound);
+
+        cubeDestroySoundError = Resources.Load<AudioClip>("error");
         audioSrc = GetComponent<AudioSource>();
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+
+
+
+    }
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
 
@@ -27,6 +32,12 @@ public class SoundManagerScript : MonoBehaviour {
                 audioSrc.PlayOneShot(cubeDestroySound);
                 Debug.Log("Entra");
                 break;
+            case "error":
+                audioSrc.PlayOneShot(cubeDestroySoundError);
+                Debug.Log("error");
+
+                break;
+
         }
     }
 }

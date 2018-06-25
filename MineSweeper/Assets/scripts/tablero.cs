@@ -9,14 +9,14 @@ using UnityEngine.SceneManagement;
 public class tablero : MonoBehaviour
 {
 
-    int x = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
-    int y = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
+    int x = 5;//AssemblyCSharp.PlayerInfo.Instance.matrix_size;
+    int y = 5;//AssemblyCSharp.PlayerInfo.Instance.matrix_size;
     public float SeperationValueX = 0.001f; // Distance between each column
     public float SeperationValueZ = 0.001f; // Distance between each Row
 
     public float tempSepX = 0; // used to calculate the separation between each column
     public float tempSepZ = 0;// used to calculate the separation between each row
-    double[,] matrix = new double[AssemblyCSharp.PlayerInfo.Instance.matrix_size, AssemblyCSharp.PlayerInfo.Instance.matrix_size];//matriz que se debe de dibujar
+    double[,] matrix = new double[5, 5];//AssemblyCSharp.PlayerInfo.Instance.matrix_size, AssemblyCSharp.PlayerInfo.Instance.matrix_size];//matriz que se debe de dibujar
     public Texture3D texture;
     public Material paredMat;
     public Material pisoMat;
@@ -40,7 +40,7 @@ public class tablero : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    /*void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))//LLamar cuando selibera una posición
             AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace(1, 1);//Pruebas Ignorar
@@ -95,7 +95,7 @@ public class tablero : MonoBehaviour
         }
         AssemblyCSharp.PlayerInfo.Instance.sendPosition();//Siempre enviar posición del usuario
     }
-
+    */
     public class Tablero
     {
         public int posX, posY;
@@ -230,9 +230,9 @@ public class tablero : MonoBehaviour
             Debug.LogFormat("Value: {0}", obj[i].content);
         }
 /*
-        matrix = new double[,] { { -1, 1, 3, 1, 2 }, { 2, 1, 4, 1, 2 },
+        matrix = new double[,] { { -1, -1, 3, -1, 2 }, { 2, 1, 4, 1, 2 },
                               { 3, 1, 6, 3, 2 }, { 3, 1, 1, 1, 1 },
-                              { 2, 1, 4, 2, 1 } };
+                              { 2, 1, 4, 2, -1 } };
         int size = x;
 
         //matrixM = inicializeMat(size, size, 0, 0);
@@ -255,6 +255,9 @@ public class tablero : MonoBehaviour
         {
             for (float j = 0; j < y; j += 1)
             {
+                     //user 2 = [size-1,0]
+             //user 3 = [size-1,size-1]
+             //user 4 = [0,size-1]
 
                 if (user == 1 && i == 0 && j == 0)
                     continue;
@@ -274,6 +277,7 @@ public class tablero : MonoBehaviour
                 if (matrix[(int)i, (int)j] < 0)
                 {
                     plane.name = i.ToString() + " " + j.ToString() + " 1";
+                    Debug.Log(plane.name);
                 }
                 plane.AddComponent<Hide>();
 
@@ -282,9 +286,90 @@ public class tablero : MonoBehaviour
             tempSepZ = 0;
         }
     }
+    void printMat(double[,] matA, int n)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                Debug.Log(matA[i, j]);
+            }
+            Debug.Log("");
+
+        }
+        Debug.Log("---------------------------");
+
+    }
+
+    double[,] Mirror(double[,] matA, int n, int idPlayer)
+    {
+        double[,] matB = new double[n, n];
+
+
+        if (idPlayer == 2)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    matB[i, j] = matA[i, n - j - 1];
+                }
+            }
+        }
+        else if (idPlayer == 4)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    matB[i, j] = matA[n - i - 1, j];
+                }
+            }
+        }
+        else if (idPlayer == 3)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    matB[i, j] = matA[n - i - 1, n - j - 1];
+                }
+            }
+        }
+        return matB;
+    }
+
+
+    double[,] inicializeMat(int mRows, int nColumns, int withVal, int val)
+    {
+        double[,] matrix = new double[nColumns, nColumns];
+        /*       for (int y = 0; y < nColumns; y++)
+               {
+                   matrix[y] = new int[nColumns];
+               }
+               */
+
+        for (int i = 0; i < mRows; i++)
+        {
+            for (int j = 0; j < nColumns; j++)
+            {
+                if (withVal == 0)
+                {
+                    matrix[i, j] = (i * 10) + j;
+                }
+                else
+                {
+                    matrix[i, j] = val;
+                }
+            }
+        }
+        return matrix;
+
+    }
+
 }
 
 
-    
-   
+
+
 

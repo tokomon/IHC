@@ -8,9 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Inicio.unity
     guid: 6377999984c94a046a5a0728fce3101e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Esperando.unity
     guid: 978dbe1b7302fa44cafaa428a7b2602a
   - enabled: 1
     path: Assets/MineSweeper.unity
     guid: bfdef12bfbe5df847a09400ebd611eb8
+  m_configObjects: {}

@@ -6,6 +6,7 @@ public class Hide : MonoBehaviour {
 
     void OnMouseDown()
     {
+        
         int pos_x;
         int pos_y;
         System.Int32.TryParse(gameObject.name[0].ToString(), out pos_x);
@@ -14,7 +15,7 @@ public class Hide : MonoBehaviour {
         Debug.LogFormat("X: {0}", pos_x);
         Debug.LogFormat("Y: {0}", pos_y);
         AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace(pos_x,pos_y);
-        /*
+        
         if (gameObject.name[gameObject.name.Length-1] != '1'){
             Destroy(gameObject);
                     SoundManagerScript.PlaySound("cube");
@@ -23,9 +24,9 @@ public class Hide : MonoBehaviour {
             //  gameObject.GetComponent<Renderer>().enabled = false;
         }
         else
-        {
+        {     SoundManagerScript.PlaySound("error");
             this.GetComponent<Renderer>().material = tablero.matPared;
-        }*/
+        }
 
     }
 }
