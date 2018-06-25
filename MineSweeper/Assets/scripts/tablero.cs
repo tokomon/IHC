@@ -9,8 +9,8 @@ using UnityEngine.SceneManagement;
 public class tablero : MonoBehaviour
 {
 
-    int x = 5;//AssemblyCSharp.PlayerInfo.Instance.matrix_size;
-    int y = 5;//AssemblyCSharp.PlayerInfo.Instance.matrix_size;
+    int x = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
+    int y = AssemblyCSharp.PlayerInfo.Instance.matrix_size;
     public float SeperationValueX = 0.001f; // Distance between each column
     public float SeperationValueZ = 0.001f; // Distance between each Row
 
@@ -40,7 +40,7 @@ public class tablero : MonoBehaviour
     }
 
     // Update is called once per frame
-    /*void Update()
+    void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))//LLamar cuando selibera una posición
             AssemblyCSharp.PlayerInfo.Instance.sendFreeSpace(1, 1);//Pruebas Ignorar
@@ -95,7 +95,7 @@ public class tablero : MonoBehaviour
         }
         AssemblyCSharp.PlayerInfo.Instance.sendPosition();//Siempre enviar posición del usuario
     }
-    */
+    
     public class Tablero
     {
         public int posX, posY;
